@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This file allows you to interactively experiment with your gem using `bin/console`
+require "bundler/setup"
+require "rails_mermaid_erd"
+require "irb"
+
+puts "Loaded rails_mermaid_erd. You can now use the gem in this IRB session."
+IRB.start 
