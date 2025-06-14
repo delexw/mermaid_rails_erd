@@ -109,11 +109,6 @@ module RailsMermaidErd
       }[assoc.macro] || "--"
     end
 
-    # Retained for compatibility
-    def annotate_column_type(model, type, name)
-      type
-    end
-
     def foreign_key_column?(model, column_name)
       table = model.table_name
       if @foreign_keys[table]
@@ -164,17 +159,27 @@ module RailsMermaidErd
         return build_habtm_relationships(from_table, to_model, assoc)
       elsif to_model&.table_exists?
         puts "  Creating standard relationship from #{from_table} to #{to_model.table_name}"
-        if [:has_many, :has_one].include?(assoc.macro)
-          # For has_many/has_one, the FK is on the target model
+        
+        if [:has_many, :belongs_to].include?(assoc.macro)
+          # Use consistent o{ -- || direction for both has_many and belongs_to
+          # Swap the tables to point in the right direction but keep FK info correct
+          if assoc.macro == :has_many
+            # FK is on target table for has_many
+            return [Relationship.new(
+              to_model.table_name, from_table, fk, "}o--||",
+              "#{to_model.table_name}.#{fk} FK → #{from_table}.#{model.primary_key} PK"
+            )]
+          else # belongs_to
+            # FK is on source table for belongs_to
+            return [Relationship.new(
+              from_table, to_model.table_name, fk, "}o--||", 
+              "#{from_table}.#{fk} FK → #{to_model.table_name}.#{to_model.primary_key} PK"
+            )]
+          end
+        else # has_one
           return [Relationship.new(
             from_table, to_model.table_name, fk, rel_type,
             "#{to_model.table_name}.#{fk} FK → #{from_table}.#{model.primary_key} PK"
-          )]
-        else # belongs_to
-          # For belongs_to, the FK is on the source model
-          return [Relationship.new(
-            from_table, to_model.table_name, fk, rel_type,
-            "#{from_table}.#{fk} FK → #{to_model.table_name}.#{to_model.primary_key} PK"
           )]
         end
       else
@@ -208,9 +213,11 @@ module RailsMermaidErd
       # If we reach here, the join table exists, so create relationships
       puts "  Creating HABTM relationships for #{join_table}"
       [
-        Relationship.new(join_table, from_table, assoc.foreign_key, "}o--||",
+        Relationship.new(
+          join_table, from_table, assoc.foreign_key, "}o--||",
           "#{join_table}.#{assoc.foreign_key} FK → #{from_table}.id PK"),
-        Relationship.new(join_table, to_model.table_name, assoc.association_foreign_key, "}o--||",
+        Relationship.new(
+          join_table, to_model.table_name, assoc.association_foreign_key, "}o--||",
           "#{join_table}.#{assoc.association_foreign_key} FK → #{to_model.table_name}.id PK")
       ]
     end
