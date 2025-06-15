@@ -20,13 +20,17 @@ namespace :rails_mermaid_erd do
       File.open(output_path, 'w') do |file|
         puts "Generating Mermaid ERD diagram..."
         RailsMermaidErd.generate(output: file)
-        puts "ERD diagram generated at: #{output_path}"
       end
     rescue Errno::EACCES, IOError => e
       puts "Error: Could not write to #{output_path}: #{e.message}"
     end
     
-    puts "You can view the diagram by copying the content and pasting it into:"
-    puts "- Mermaid ERD Visualizer: https://github.com/delexw/mermaid-erd-visualizer"
+    # Make output instructions more visible
+    puts "\n" + "="*80
+    puts "\n ERD diagram generated at: #{output_path}"
+    puts "\n  📊 DIAGRAM VIEWING:\n".upcase
+    puts "\n   - Mermaid ERD Visualizer: https://github.com/delexw/mermaid-erd-visualizer"
+    puts "\n"
+    puts "="*80 + "\n"
   end
 end 
