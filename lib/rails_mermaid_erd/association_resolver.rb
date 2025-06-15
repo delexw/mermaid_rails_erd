@@ -3,50 +3,30 @@
 module RailsMermaidErd
   class AssociationResolver
     def resolve(assoc)
-      begin
-        klass = assoc.klass
-        return klass
-      rescue NameError, ArgumentError => e
-        # Try multiple approaches to resolve the class
-        # 1. Try using class_name option
-        if assoc.options[:class_name]
-          class_name = assoc.options[:class_name].to_s
-          resolved = class_name.safe_constantize
-          return resolved if resolved
+      # Try direct table_name access if available
+      if assoc.respond_to?(:table_name)
+        begin
+          table_name = assoc.table_name
+        rescue => e
+          table_name = nil
         end
-        
-        # 2. Try standard classify approach
-        standard_class_name = assoc.name.to_s.classify
-        resolved = standard_class_name.safe_constantize
-        return resolved if resolved
-        
-        # 3. Try within the namespace of the source model
-        if assoc.active_record.name.include?('::')
-          namespace = assoc.active_record.name.deconstantize
-          namespaced_class = "#{namespace}::#{standard_class_name}".safe_constantize
-          return namespaced_class if namespaced_class
-        end
-        
-        # Generate best guess for table name
-        table_name = if assoc.options[:table_name]
-          assoc.options[:table_name].to_s
-        else
-          assoc.name.to_s.tableize
-        end
-        
-        # Check if table exists
-        if ActiveRecord::Base.connection.table_exists?(table_name)
-          # Create dynamic model class for diagram purposes
-          klass = Class.new(ActiveRecord::Base)
-          klass.define_singleton_method(:table_exists?) { true }
-          klass.define_singleton_method(:table_name) { table_name }
-          klass.define_singleton_method(:primary_key) { "id" }
-          return klass
-        end
-        
-        puts "  Failed all attempts to resolve association class for #{assoc.name}"
-        return nil
       end
+      
+      # Determine table name from options or plural_name if not already set
+      table_name ||= if assoc.options[:table_name]
+        assoc.options[:table_name].to_s
+      else
+        assoc.plural_name.to_s
+      end
+      
+      # Check if table exists
+      return nil unless ActiveRecord::Base.connection.table_exists?(table_name)
+      
+      # Return a hash with necessary information
+      {
+        table_name: table_name,
+        primary_key: ActiveRecord::Base.connection.primary_key(table_name)
+      }
     end
   end
 end 

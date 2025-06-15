@@ -13,9 +13,9 @@ module RailsMermaidErd
 
       def build(model, assoc, models)
         from_table = model.table_name
-        to_model = resolve_association_model(model, assoc)
+        to_table_info = resolve_association_model(model, assoc)
         
-        if !to_model
+        if !to_table_info
           return log_missing_table_warning(model, assoc, "target model does not exist")
         end
         
@@ -31,14 +31,35 @@ module RailsMermaidErd
           end
         end
         
+        # Try to get the foreign keys
+        source_fk = nil
+        target_fk = nil
+        
+        begin
+          source_fk = assoc.foreign_key
+        rescue => e
+          puts "  WARNING: Could not determine foreign key for #{model.name} in HABTM: #{e.message}"
+        end
+        
+        begin
+          target_fk = assoc.association_foreign_key
+        rescue => e
+          puts "  WARNING: Could not determine association foreign key for #{model.name}##{assoc.name}: #{e.message}"
+        end
+        
+        # Skip if we couldn't determine both foreign keys
+        if !source_fk || !target_fk
+          return log_missing_table_warning(model, assoc, "could not determine foreign keys")
+        end
+        
         # If we reach here, the join table exists, so create relationships
         [
           Relationship.new(
-            join_table, from_table, assoc.foreign_key, "}o--||",
-            "#{join_table}.#{assoc.foreign_key} FK → #{from_table}.id PK"),
+            join_table, from_table, source_fk, "}o--||",
+            "#{join_table}.#{source_fk} FK → #{from_table}.#{model.primary_key} PK"),
           Relationship.new(
-            join_table, to_model.table_name, assoc.association_foreign_key, "}o--||",
-            "#{join_table}.#{assoc.association_foreign_key} FK → #{to_model.table_name}.id PK")
+            join_table, to_table_info[:table_name], target_fk, "}o--||",
+            "#{join_table}.#{target_fk} FK → #{to_table_info[:table_name]}.#{to_table_info[:primary_key]} PK")
         ]
       end
     end

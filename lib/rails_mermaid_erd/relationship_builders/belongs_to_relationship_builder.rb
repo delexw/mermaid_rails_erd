@@ -7,15 +7,21 @@ module RailsMermaidErd
     class BelongsToRelationshipBuilder < BaseRelationshipBuilder
       def build(model, assoc, models)
         from_table = model.table_name
-        fk = assoc.foreign_key
+        fk = safe_foreign_key(model, assoc)
         
-        to_model = resolve_association_model(model, assoc)
+        # Skip if we couldn't determine the foreign key
+        return [] unless fk
+        
+        to_table_info = resolve_association_model(model, assoc)
+        
+        # Skip if this is a duplicate one-to-one relationship
+        return [] if skip_duplicate_one_to_one?(model, assoc, to_table_info)
 
-        if to_model&.table_exists?
+        if to_table_info
           # FK is on source table for belongs_to
           [Relationship.new(
-            from_table, to_model.table_name, fk, "}o--||", 
-            "#{from_table}.#{fk} FK → #{to_model.table_name}.#{to_model.primary_key} PK"
+            from_table, to_table_info[:table_name], fk, "}o--||", 
+            "#{from_table}.#{fk} FK → #{to_table_info[:table_name]}.#{to_table_info[:primary_key]} PK"
           )]
         else
           log_missing_table_warning(model, assoc)

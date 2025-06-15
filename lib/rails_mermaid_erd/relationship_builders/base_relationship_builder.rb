@@ -6,6 +6,9 @@ module RailsMermaidErd
   module RelationshipBuilders
     class BaseRelationshipBuilder
       attr_reader :symbol_mapper, :association_resolver
+      
+      # Class variable to track one-to-one relationships across builder instances
+      @@one_to_one_keys = Set.new
 
       def initialize(symbol_mapper:, association_resolver:)
         @symbol_mapper = symbol_mapper
@@ -28,6 +31,38 @@ module RailsMermaidErd
           puts e.backtrace.join("\n")
           return nil
         end
+      end
+      
+      def safe_foreign_key(model, assoc)
+        # Skip through associations entirely
+        return nil if assoc.options[:through]
+        
+        # Try to get the foreign key
+        begin
+          return assoc.foreign_key
+        rescue Module::DelegationError, NoMethodError => e
+          puts "  WARNING: Cannot determine foreign key for #{model.name}##{assoc.name} - skipping"
+          return nil
+        end
+      end
+      
+      def skip_duplicate_one_to_one?(model, assoc, to_table_info)
+        return false unless [:has_one, :belongs_to].include?(assoc.macro)
+        
+        # Skip the check for polymorphic associations
+        return false if assoc.options[:polymorphic]
+        
+        return false unless to_table_info
+        
+        # Create a unique key for this one-to-one relationship
+        rel_key = [model.table_name, to_table_info[:table_name], '1:1'].sort.join("::")
+        
+        # Check if we've already processed this relationship
+        return true if @@one_to_one_keys.include?(rel_key)
+        
+        # Mark this relationship as processed
+        @@one_to_one_keys << rel_key
+        false
       end
       
       def log_missing_table_warning(model, assoc, reason = "table does not exist")
