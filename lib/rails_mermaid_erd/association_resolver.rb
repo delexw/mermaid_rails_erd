@@ -6,7 +6,7 @@ module RailsMermaidErd
       begin
         klass = assoc.klass
         return klass
-      rescue NameError => e
+      rescue NameError, ArgumentError => e
         # Try multiple approaches to resolve the class
         # 1. Try using class_name option
         if assoc.options[:class_name]
@@ -26,11 +26,6 @@ module RailsMermaidErd
           namespaced_class = "#{namespace}::#{standard_class_name}".safe_constantize
           return namespaced_class if namespaced_class
         end
-        
-        # 4. For polymorphic associations or when class can't be found,
-        # create a placeholder model with correct table_name
-        puts "  Could not resolve association class: #{assoc.name}"
-        puts "  Will try to use table name based on association name"
         
         # Generate best guess for table name
         table_name = if assoc.options[:table_name]
