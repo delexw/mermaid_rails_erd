@@ -11,6 +11,7 @@ A Ruby gem that generates [Mermaid.js](https://mermaid.js.org/) Entity Relations
 - 📊 **Mermaid ERD Generation**: Outputs clean, readable Mermaid.js ERD syntax
 - 🚀 **Simple Integration**: Easy-to-use Rake task for generating diagrams
 - 🔗 **Relationship Mapping**: Supports `belongs_to`, `has_one`, `has_many`, and `has_and_belongs_to_many` associations
+- 💫 **Polymorphic Support**: Accurately discovers and maps polymorphic relationships
 - 📱 **Multiple Output Options**: Generate files or output to any IO stream
 - ✅ **Rails 3+ Support**: Compatible with ActiveRecord 3.0 and above
 
@@ -125,35 +126,35 @@ The gem will generate:
 erDiagram
   users {
     bigint id PK
-    varchar(255) email NOT NULL
-    varchar(255) name NOT NULL
-    timestamp(6) created_at NOT NULL
-    timestamp(6) updated_at NOT NULL
+    varchar email NOT NULL
+    varchar name NOT NULL
+    timestamp created_at NOT NULL
+    timestamp updated_at NOT NULL
   }
   
   posts {
     bigint id PK
     bigint user_id NOT NULL
-    varchar(255) title NOT NULL
+    varchar title NOT NULL
     text content
-    timestamp(6) created_at NOT NULL
-    timestamp(6) updated_at NOT NULL
+    timestamp created_at NOT NULL
+    timestamp updated_at NOT NULL
   }
   
   comments {
     bigint id PK
     bigint post_id NOT NULL
     text content NOT NULL
-    timestamp(6) created_at NOT NULL
-    timestamp(6) updated_at NOT NULL
+    timestamp created_at NOT NULL
+    timestamp updated_at NOT NULL
   }
   
   profiles {
     bigint id PK
     bigint user_id NOT NULL
     text bio
-    timestamp(6) created_at NOT NULL
-    timestamp(6) updated_at NOT NULL
+    timestamp created_at NOT NULL
+    timestamp updated_at NOT NULL
   }
   
   users ||--o{ posts : "user_id"
@@ -161,16 +162,37 @@ erDiagram
   users ||--|| profiles : "user_id"
 ```
 
+## Polymorphic Associations
+
+The gem automatically detects and properly maps polymorphic associations in your models. For example:
+
+```ruby
+class Comment < ActiveRecord::Base
+  belongs_to :commentable, polymorphic: true
+end
+
+class Post < ActiveRecord::Base
+  has_many :comments, as: :commentable
+end
+
+class Photo < ActiveRecord::Base
+  has_many :comments, as: :commentable
+end
+```
+
+The ERD will correctly show relationships between `comments` and both `posts` and `photos` tables.
+
 ## Supported ActiveRecord Associations
 
 - **belongs_to**: Generates one-to-many relationships
 - **has_one**: Generates one-to-one relationships  
 - **has_many**: Covered by the corresponding belongs_to
 - **has_and_belongs_to_many**: Generates many-to-many relationships
+- **polymorphic**: Discovers and maps all polymorphic interfaces
 
 ## Column Types
 
-The gem uses actual database SQL column types in the ERD output (e.g., `bigint`, `varchar(255)`, `text`, `boolean`, `timestamp(6)`, etc.). This provides the most accurate representation of your actual database schema.
+The gem uses actual database SQL column types in the ERD output (e.g., `bigint`, `varchar`, `text`, `boolean`, `timestamp`, etc.). This provides the most accurate representation of your actual database schema.
 
 ## Development
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Improved polymorphic relationship discovery using Rails' reflection API
+- More robust detection of polymorphic associations without relying on naming patterns
+- Added `PolymorphicRelationshipBuilder` class for accurately mapping polymorphic interfaces
+- Updated documentation with polymorphic association examples
+
 ## [0.1.0] - 2024-01-XX
 
 ### Added

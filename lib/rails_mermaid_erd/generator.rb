@@ -8,8 +8,7 @@ require_relative "association_resolver"
 require_relative "polymorphic_targets_resolver"
 require_relative "relationship_symbol_mapper"
 require_relative "relationship_registry"
-require_relative "table_collector"
-require_relative "relationship_builders/base_relationship_builder"
+require_relative "model_data_collector"
 
 module RailsMermaidErd
   class Generator
@@ -21,8 +20,8 @@ module RailsMermaidErd
       @model_loader = ModelLoader.new
       @association_resolver = AssociationResolver.new
       @symbol_mapper = RelationshipSymbolMapper.new
-      @polymorphic_resolver = PolymorphicTargetsResolver.new
-      @table_collector = TableCollector.new
+      @model_data_collector = ModelDataCollector.new
+      @polymorphic_resolver = PolymorphicTargetsResolver.new(@model_data_collector)
       @relationship_registry = RelationshipRegistry.new(
         symbol_mapper: @symbol_mapper,
         association_resolver: @association_resolver,
@@ -32,31 +31,24 @@ module RailsMermaidErd
     end
 
     def generate
+      # Load models
       models = @model_loader.load
-      tables = @table_collector.collect_tables(models)
-      relationships = []
 
-      # First pass: collect tables and build relationships
-      models.each do |model|
-        begin
-          next if model < model.base_class || !model.table_exists?
+      # Collect all model data - this also registers polymorphic targets and collects tables
+      filtered_models = models.reject { |model| model < model.base_class || !model.table_exists? }
+      @model_data_collector.collect(filtered_models)
 
-          model.reflect_on_all_associations.each do |assoc|
-            begin
-              relationships += @relationship_registry.build_relationships(model, assoc, models)
-            rescue => e
-              puts "ERROR processing association #{model.name}##{assoc.name}: #{e.class} - #{e.message}"
-              puts e.backtrace.join("\n")
-            end
-          end
-        rescue => e
-          puts "ERROR processing model #{model.name}: #{e.class} - #{e.message}"
-          puts e.backtrace.join("\n")
-        end
+      # Build all relationships with polymorphic handling first
+      begin
+        relationships = @relationship_registry.build_all_relationships(filtered_models)
+      rescue => e
+        puts "ERROR building relationships: #{e.class} - #{e.message}"
+        puts e.backtrace.join("\n")
+        relationships = []
       end
       
-      # Second pass: update table definitions with FK annotations
-      tables = @table_collector.update_foreign_keys(tables, relationships)
+      # Update table definitions with FK annotations
+      tables = @model_data_collector.update_foreign_keys(relationships)
 
       MermaidEmitter.new(@output, tables, relationships).emit
     end
