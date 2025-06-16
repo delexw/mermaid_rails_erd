@@ -10,10 +10,15 @@ module RailsMermaidErd
   class RelationshipRegistry
     attr_reader :builders, :polymorphic_resolver, :model_data_collector
 
-    def initialize(symbol_mapper:, association_resolver:, polymorphic_resolver:, printed_tables: Set.new)
+    def initialize(
+      symbol_mapper:, 
+      association_resolver:, 
+      polymorphic_resolver:, 
+      printed_tables: Set.new, 
+      model_data_collector:)
       @polymorphic_resolver = polymorphic_resolver
-      # We will use the same model_data_collector that's provided via the polymorphic_resolver
-      @model_data_collector = polymorphic_resolver.model_data_collector
+      @model_data_collector = model_data_collector
+      @printed_tables = printed_tables
       
       @builders = {
         belongs_to: RelationshipBuilders::BelongsToRelationshipBuilder.new(

@@ -26,7 +26,8 @@ module RailsMermaidErd
         symbol_mapper: @symbol_mapper,
         association_resolver: @association_resolver,
         polymorphic_resolver: @polymorphic_resolver,
-        printed_tables: @printed_tables
+        printed_tables: @printed_tables,
+        model_data_collector: @model_data_collector
       )
     end
 
