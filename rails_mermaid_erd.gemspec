@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
     README.md
     Rakefile
     rails_mermaid_erd.gemspec
+    LICENSE
   ]
   spec.bindir        = "bin"
   spec.executables   = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }
