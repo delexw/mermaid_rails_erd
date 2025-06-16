@@ -20,8 +20,15 @@ module RailsMermaidErd
         if to_table_info
           # FK is on source table for belongs_to
           [Relationship.new(
-            from_table, to_table_info[:table_name], fk, "}o--||", 
-            "#{from_table}.#{fk} FK → #{to_table_info[:table_name]}.#{to_table_info[:primary_key]} PK"
+            from_table, 
+            to_table_info[:table_name], 
+            fk, 
+            "}o--||", 
+            nil, # Let the Relationship generate the label
+            from_table, # fk_table
+            fk, # fk_column
+            to_table_info[:table_name], # pk_table
+            to_table_info[:primary_key] # pk_column
           )]
         else
           log_missing_table_warning(model, assoc)

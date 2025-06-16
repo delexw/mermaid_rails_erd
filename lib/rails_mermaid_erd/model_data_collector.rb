@@ -129,13 +129,12 @@ module RailsMermaidErd
       
       relationships.each do |rel|
         begin
-          if rel.label =~ /(.+?)\.(.+?) FK/
-            table_name = $1
-            fk_column = $2
-            
-            fk_mapping[table_name] ||= []
-            fk_mapping[table_name] << fk_column unless fk_mapping[table_name].include?(fk_column)
-          end
+          # Use the relationship attributes directly instead of parsing the label
+          table_name = rel.fk_table
+          fk_column = rel.fk_column
+          
+          fk_mapping[table_name] ||= []
+          fk_mapping[table_name] << fk_column unless fk_mapping[table_name].include?(fk_column)
         rescue => e
           puts "Error extracting FK from relationship: #{e.message}"
         end

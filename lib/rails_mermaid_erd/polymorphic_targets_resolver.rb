@@ -16,9 +16,20 @@ module RailsMermaidErd
       
       # Create relationships for each target model
       target_models.map do |target|
+        fk_column = "#{name}_id"
         Relationship.new(
-          from_table, target.table_name, "#{name}_id", rel_type,
-          "#{from_table}.#{name}_id FK → #{target.table_name}.id PK (polymorphic)"
+          from_table, 
+          target.table_name, 
+          fk_column, 
+          rel_type,
+          nil, # Let the Relationship generate the label
+          from_table, # fk_table 
+          fk_column, # fk_column
+          target.table_name, # pk_table
+          "id", # pk_column
+          # Add (polymorphic) to the label
+          true, # is_polymorphic
+          "polymorphic" # extra_label
         )
       end
     end

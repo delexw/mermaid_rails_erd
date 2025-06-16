@@ -32,9 +32,18 @@ RSpec.describe RailsMermaidErd::MermaidEmitter do
       
       let(:relationships) do
         [
-          RailsMermaidErd::Relationship.new("posts", "users", "user_id", "||--o{", "posts.user_id FK → users.id PK"),
-          RailsMermaidErd::Relationship.new("comments", "posts", "post_id", "||--o{", "comments.post_id FK → posts.id PK"),
-          RailsMermaidErd::Relationship.new("comments", "users", "user_id", "||--o{", "comments.user_id FK → users.id PK")
+          RailsMermaidErd::Relationship.new(
+            "posts", "users", "user_id", "||--o{", nil,
+            "posts", "user_id", "users", "id"
+          ),
+          RailsMermaidErd::Relationship.new(
+            "comments", "posts", "post_id", "||--o{", nil,
+            "comments", "post_id", "posts", "id"
+          ),
+          RailsMermaidErd::Relationship.new(
+            "comments", "users", "user_id", "||--o{", nil,
+            "comments", "user_id", "users", "id"
+          )
         ]
       end
       

@@ -55,11 +55,27 @@ module RailsMermaidErd
         # If we reach here, the join table exists, so create relationships
         [
           Relationship.new(
-            join_table, from_table, source_fk, "}o--||",
-            "#{join_table}.#{source_fk} FK → #{from_table}.#{model.primary_key} PK"),
+            join_table, 
+            from_table, 
+            source_fk, 
+            "}o--||",
+            nil, # Let the Relationship generate the label
+            join_table, # fk_table
+            source_fk, # fk_column
+            from_table, # pk_table
+            model.primary_key # pk_column
+          ),
           Relationship.new(
-            join_table, to_table_info[:table_name], target_fk, "}o--||",
-            "#{join_table}.#{target_fk} FK → #{to_table_info[:table_name]}.#{to_table_info[:primary_key]} PK")
+            join_table, 
+            to_table_info[:table_name], 
+            target_fk, 
+            "}o--||",
+            nil, # Let the Relationship generate the label
+            join_table, # fk_table
+            target_fk, # fk_column
+            to_table_info[:table_name], # pk_table
+            to_table_info[:primary_key] # pk_column
+          )
         ]
       end
     end

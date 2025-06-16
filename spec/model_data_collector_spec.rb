@@ -107,11 +107,15 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
       collector.collect([model])
       
       # Create a mock relationship with FK information
-      relationship = double("Relationship", 
-                         label: "models.user_id FK → users.id PK", 
-                         from_table: "models", 
-                         to_table: "users", 
-                         foreign_key: "user_id")
+      relationship = double(
+        "Relationship", 
+        from_table: "models", 
+        to_table: "users", 
+        foreign_key: "user_id",
+        fk_type: "belongs_to",
+        fk_column: "user_id",
+        fk_table: "models"
+      )
       
       # Update foreign keys
       collector.update_foreign_keys([relationship])
