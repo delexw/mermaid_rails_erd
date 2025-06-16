@@ -5,7 +5,7 @@ require_relative "base_relationship_builder"
 module RailsMermaidErd
   module RelationshipBuilders
     class HasManyRelationshipBuilder < BaseRelationshipBuilder
-      def build(model, assoc, models)
+      def build(model, assoc)
         from_table = model.table_name
         fk = safe_foreign_key(model, assoc)
         

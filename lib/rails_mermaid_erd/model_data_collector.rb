@@ -4,18 +4,20 @@ require_relative "column_info"
 
 module RailsMermaidErd
   class ModelDataCollector
-    attr_reader :models_data, :tables
+    attr_reader :models_data, :tables, :models_without_tables, :models
     
-    def initialize
+    def initialize(model_loader)
       @models_data = {}
       @polymorphic_associations = []
       @regular_associations = []
       @polymorphic_targets = Hash.new { |h, k| h[k] = [] }
       @tables = {}
+      @models_without_tables = {}
+      @models = model_loader.load
     end
     
-    def collect(models)
-      models.each do |model|
+    def collect
+      (base_models & models_with_tables).each do |model|
         model_data = { model: model, associations: [] }
         
         # Register polymorphic interfaces that this model implements
@@ -35,8 +37,11 @@ module RailsMermaidErd
         
         @models_data[model.name] = model_data
         
-        # Collect table information if the model has a table
-        collect_table_for_model(model) if can_collect_table?(model)
+        collect_table_for_model(model)
+      end
+
+      (base_models & models_without_tables).each do |model|
+        @models_without_tables[model.name] = { model: model }
       end
       
       self
@@ -115,10 +120,17 @@ module RailsMermaidErd
     end
     
     private
-    
-    # Check if we can collect table information for this model
-    def can_collect_table?(model)
-      !(model < model.base_class || !model.table_exists?)
+
+    def base_models
+      return models.select { |model| !(model < model.base_class) }
+    end
+
+    def models_with_tables
+      return models.select { |model| model.table_exists? }
+    end
+
+    def models_without_tables
+      return models.select { |model| !model.table_exists? }
     end
     
     # Extract foreign key information from relationships

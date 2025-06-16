@@ -11,7 +11,7 @@ module RailsMermaidErd
         @printed_tables = printed_tables
       end
 
-      def build(model, assoc, models)
+      def build(model, assoc)
         from_table = model.table_name
         to_table_info = resolve_association_model(model, assoc)
         

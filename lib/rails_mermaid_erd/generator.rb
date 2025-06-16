@@ -20,7 +20,7 @@ module RailsMermaidErd
       @model_loader = ModelLoader.new
       @association_resolver = AssociationResolver.new
       @symbol_mapper = RelationshipSymbolMapper.new
-      @model_data_collector = ModelDataCollector.new
+      @model_data_collector = ModelDataCollector.new(@model_loader)
       @polymorphic_resolver = PolymorphicTargetsResolver.new(@model_data_collector)
       @relationship_registry = RelationshipRegistry.new(
         symbol_mapper: @symbol_mapper,
@@ -32,16 +32,11 @@ module RailsMermaidErd
     end
 
     def generate
-      # Load models
-      models = @model_loader.load
-
-      # Collect all model data - this also registers polymorphic targets and collects tables
-      filtered_models = models.reject { |model| model < model.base_class || !model.table_exists? }
-      @model_data_collector.collect(filtered_models)
+      @model_data_collector.collect
 
       # Build all relationships with polymorphic handling first
       begin
-        relationships = @relationship_registry.build_all_relationships(filtered_models)
+        relationships = @relationship_registry.build_all_relationships
       rescue => e
         puts "ERROR building relationships: #{e.class} - #{e.message}"
         puts e.backtrace.join("\n")

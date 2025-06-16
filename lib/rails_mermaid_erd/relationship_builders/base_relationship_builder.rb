@@ -15,7 +15,7 @@ module RailsMermaidErd
         @association_resolver = association_resolver
       end
 
-      def build(model, assoc, models)
+      def build(model, assoc)
         raise NotImplementedError, "Subclasses must implement #build"
       end
       

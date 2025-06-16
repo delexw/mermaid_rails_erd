@@ -41,37 +41,37 @@ module RailsMermaidErd
       }
     end
 
-    def build_relationships(model, assoc, models)
+    def build_relationships(model, assoc)
       # Check for polymorphic association first
       if assoc.options[:polymorphic]
         from_table = model.table_name
         rel_type = builders[assoc.macro].symbol_mapper.map(assoc.macro)
-        return polymorphic_resolver.resolve(assoc.name.to_s, from_table, rel_type, models)
+        return polymorphic_resolver.resolve(assoc.name.to_s, from_table, rel_type)
       end
       
       # Delegate to the appropriate builder
       builder = builders[assoc.macro]
-      return builder.build(model, assoc, models) if builder
+      return builder.build(model, assoc) if builder
       
       # If no builder exists for this macro type, return an empty array
       []
     end
     
-    def build_all_relationships(models)
+    def build_all_relationships
       relationships = []
       
       # Process polymorphic associations first
       @model_data_collector.polymorphic_associations.each do |data|
         model = data[:model]
         assoc = data[:association]
-        relationships.concat(build_relationships(model, assoc, models))
+        relationships.concat(build_relationships(model, assoc))
       end
       
       # Then process regular associations
       @model_data_collector.regular_associations.each do |data|
         model = data[:model]
         assoc = data[:association]
-        relationships.concat(build_relationships(model, assoc, models))
+        relationships.concat(build_relationships(model, assoc))
       end
       
       relationships

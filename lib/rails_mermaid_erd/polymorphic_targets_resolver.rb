@@ -10,7 +10,7 @@ module RailsMermaidErd
       @model_data_collector = model_data_collector
     end
     
-    def resolve(name, from_table, rel_type, models)
+    def resolve(name, from_table, rel_type)
       # Get all models that implement the polymorphic interface
       target_models = model_data_collector.polymorphic_targets_for(name)
       
