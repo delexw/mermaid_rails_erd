@@ -30,7 +30,7 @@ RSpec.describe RailsMermaidErd::PolymorphicTargetsResolver do
     end
     
     it "returns relationships for models implementing a specific interface" do
-      relationships = resolver.resolve("commentable", "comments", "||--o{", models)
+      relationships = resolver.resolve("commentable", "comments", "||--o{")
       
       expect(relationships.size).to eq(2)
       expect(relationships.map(&:to_table)).to include("posts")
@@ -38,13 +38,13 @@ RSpec.describe RailsMermaidErd::PolymorphicTargetsResolver do
     end
     
     it "returns empty array for unknown interface" do
-      relationships = resolver.resolve("unknown_interface", "comments", "||--o{", models)
+      relationships = resolver.resolve("unknown_interface", "comments", "||--o{")
       
       expect(relationships).to be_empty
     end
     
     it "returns only relationships for models implementing the specified interface" do
-      relationships = resolver.resolve("likeable", "reactions", "||--o{", models)
+      relationships = resolver.resolve("likeable", "reactions", "||--o{")
       
       expect(relationships.size).to eq(1)
       expect(relationships.first.to_table).to eq("comments")
@@ -54,7 +54,7 @@ RSpec.describe RailsMermaidErd::PolymorphicTargetsResolver do
       # Reset the model_data_collector to return empty array
       allow(model_data_collector).to receive(:polymorphic_targets_for).with("commentable").and_return([])
       
-      relationships = resolver.resolve("commentable", "comments", "||--o{", models)
+      relationships = resolver.resolve("commentable", "comments", "||--o{")
       
       expect(relationships).to be_empty
     end

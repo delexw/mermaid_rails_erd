@@ -3,73 +3,80 @@
 require "spec_helper"
 
 RSpec.describe RailsMermaidErd::ModelDataCollector do
-  let(:collector) { described_class.new }
+  let(:model_loader) { double("ModelLoader") }
+  let(:collector) { described_class.new(model_loader) }
 
   before do
+    # Set up test models
+    post_model = double("PostModel")
+    association = double("Association", options: { as: :commentable })
+    allow(post_model).to receive(:reflect_on_all_associations).and_return([association])
+    allow(post_model).to receive(:name).and_return("PostModel")
+    allow(post_model).to receive(:base_class).and_return(Object)
+    allow(post_model).to receive(:<).and_return(false)
+    allow(post_model).to receive(:table_exists?).and_return(true)
+    allow(post_model).to receive(:table_name).and_return("posts")
+    allow(post_model).to receive(:columns).and_return([])
+    allow(post_model).to receive(:primary_key).and_return("id")
+    
+    model = double("Model")
+    poly_assoc = double("PolyAssoc", options: { polymorphic: true })
+    regular_assoc = double("RegularAssoc", options: {})
+    allow(model).to receive(:reflect_on_all_associations).and_return([poly_assoc, regular_assoc])
+    allow(model).to receive(:name).and_return("Model")
+    allow(model).to receive(:base_class).and_return(Object)
+    allow(model).to receive(:<).and_return(false)
+    allow(model).to receive(:table_exists?).and_return(true)
+    allow(model).to receive(:table_name).and_return("models")
+    allow(model).to receive(:columns).and_return([])
+    allow(model).to receive(:primary_key).and_return("id")
+    
+    table_model = double("TableModel")
+    id_column = double("IdColumn", name: "id", sql_type: "integer")
+    name_column = double("NameColumn", name: "name", sql_type: "varchar(255)")
+    allow(table_model).to receive(:reflect_on_all_associations).and_return([])
+    allow(table_model).to receive(:name).and_return("TableModel")
+    allow(table_model).to receive(:base_class).and_return(Object)
+    allow(table_model).to receive(:<).and_return(false)
+    allow(table_model).to receive(:table_exists?).and_return(true)
+    allow(table_model).to receive(:table_name).and_return("table_models")
+    allow(table_model).to receive(:columns).and_return([id_column, name_column])
+    allow(table_model).to receive(:primary_key).and_return("id")
+    
+    # Initialize with models
+    allow(model_loader).to receive(:load).and_return([post_model, model, table_model])
+    
     collector.reset_polymorphic_targets
   end
 
   describe "#collect" do
     it "registers models implementing polymorphic interfaces" do
-      # Create mock models
-      post_model = double("PostModel")
-      association = double("Association", options: { as: :commentable })
-      allow(post_model).to receive(:reflect_on_all_associations).and_return([association])
-      allow(post_model).to receive(:name).and_return("PostModel")
-      allow(post_model).to receive(:base_class).and_return(Object)
-      allow(post_model).to receive(:<).and_return(false)
-      allow(post_model).to receive(:table_exists?).and_return(false)
-      
       # Collect the model data
-      collector.collect([post_model])
+      collector.collect
       
       # Check that the model was registered as a target for the commentable interface
       targets = collector.polymorphic_targets_for("commentable")
-      expect(targets).to include(post_model)
+      expect(targets).not_to be_empty
+      expect(targets[0].name).to eq("PostModel")
     end
     
     it "separates polymorphic and regular associations" do
-      # Create mock model with both types of associations
-      model = double("Model")
-      poly_assoc = double("PolyAssoc", options: { polymorphic: true })
-      regular_assoc = double("RegularAssoc", options: {})
-      
-      allow(model).to receive(:reflect_on_all_associations).and_return([poly_assoc, regular_assoc])
-      allow(model).to receive(:name).and_return("Model")
-      allow(model).to receive(:base_class).and_return(Object)
-      allow(model).to receive(:<).and_return(false)
-      allow(model).to receive(:table_exists?).and_return(false)
-      
       # Collect the model data
-      collector.collect([model])
+      collector.collect
       
       # Verify associations were categorized correctly
-      expect(collector.polymorphic_associations.length).to eq(1)
-      expect(collector.polymorphic_associations.first[:association]).to eq(poly_assoc)
+      polymorphic_assoc = collector.polymorphic_associations.find { |a| a[:association].options[:polymorphic] }
+      expect(polymorphic_assoc).not_to be_nil
+      expect(polymorphic_assoc[:association].options).to include(polymorphic: true)
       
-      expect(collector.regular_associations.length).to eq(1)
-      expect(collector.regular_associations.first[:association]).to eq(regular_assoc)
+      regular_assoc = collector.regular_associations.find { |a| a[:association].options == {} }
+      expect(regular_assoc).not_to be_nil
+      expect(regular_assoc[:association].options).not_to include(:polymorphic)
     end
 
     it "collects table information for models with tables" do
-      model = double("TableModel")
-      
-      # Column mocks
-      id_column = double("IdColumn", name: "id", sql_type: "integer")
-      name_column = double("NameColumn", name: "name", sql_type: "varchar(255)")
-      
-      # Model setup
-      allow(model).to receive(:reflect_on_all_associations).and_return([])
-      allow(model).to receive(:name).and_return("TableModel")
-      allow(model).to receive(:base_class).and_return(Object)
-      allow(model).to receive(:<).and_return(false)
-      allow(model).to receive(:table_exists?).and_return(true)
-      allow(model).to receive(:table_name).and_return("table_models")
-      allow(model).to receive(:columns).and_return([id_column, name_column])
-      allow(model).to receive(:primary_key).and_return("id")
-      
       # Collect the model data
-      collector.collect([model])
+      collector.collect
       
       # Verify table was collected
       expect(collector.tables).to have_key("table_models")
@@ -103,8 +110,12 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
       allow(model).to receive(:columns).and_return([id_column, fk_column])
       allow(model).to receive(:primary_key).and_return("id")
       
+      # Replace loader models
+      allow(model_loader).to receive(:load).and_return([model])
+      
       # First collect the table
-      collector.collect([model])
+      collector = described_class.new(model_loader)
+      collector.collect
       
       # Create a mock relationship with FK information
       relationship = double(

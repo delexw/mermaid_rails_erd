@@ -11,7 +11,6 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
     context "with standard has_many association" do
       let(:model) { double("Model") }
       let(:assoc) { double("Association") }
-      let(:models) { [] }
 
       before do
         allow(model).to receive(:table_name).and_return("users")
@@ -28,7 +27,7 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
       end
 
       it "creates a relationship with the correct attributes" do
-        relationships = builder.build(model, assoc, models)
+        relationships = builder.build(model, assoc)
         expect(relationships.size).to eq(1)
         
         relationship = relationships.first
@@ -43,7 +42,6 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
     context "with polymorphic has_many association (with :as)" do
       let(:model) { double("Model") }
       let(:assoc) { double("Association") }
-      let(:models) { [] }
 
       before do
         allow(model).to receive(:table_name).and_return("posts")
@@ -63,7 +61,7 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
       end
 
       it "returns an empty array for polymorphic has_many" do
-        relationships = builder.build(model, assoc, models)
+        relationships = builder.build(model, assoc)
         expect(relationships).to eq([])
       end
     end

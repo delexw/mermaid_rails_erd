@@ -4,7 +4,7 @@ require_relative "column_info"
 
 module RailsMermaidErd
   class ModelDataCollector
-    attr_reader :models_data, :tables, :models_without_tables, :models
+    attr_reader :models_data, :tables, :models_no_tables, :models
     
     def initialize(model_loader)
       @models_data = {}
@@ -12,7 +12,7 @@ module RailsMermaidErd
       @regular_associations = []
       @polymorphic_targets = Hash.new { |h, k| h[k] = [] }
       @tables = {}
-      @models_without_tables = {}
+      @models_no_tables = {}
       @models = model_loader.load
     end
     
@@ -41,7 +41,7 @@ module RailsMermaidErd
       end
 
       (base_models & models_without_tables).each do |model|
-        @models_without_tables[model.name] = { model: model }
+        @models_no_tables[model.name] = { model: model }
       end
       
       self

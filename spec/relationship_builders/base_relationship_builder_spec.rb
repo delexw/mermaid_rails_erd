@@ -11,8 +11,7 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
     it "raises NotImplementedError" do
       model = double("Model")
       assoc = double("Association")
-      models = []
-      expect { builder.build(model, assoc, models) }.to raise_error(NotImplementedError)
+      expect { builder.build(model, assoc) }.to raise_error(NotImplementedError)
     end
   end
   
