@@ -70,6 +70,41 @@ RailsMermaidErd.generate(output: output)
 erd_content = output.string
 ```
 
+### Advanced Usage: Model Data Interface
+
+You can access the collected model and relationship data directly using the `ModelDataCollector` class:
+
+```ruby
+# Get collected model data without generating a diagram
+model_loader = RailsMermaidErd::ModelLoader.new
+collector = RailsMermaidErd::ModelDataCollector.new(model_loader)
+data = collector.collect
+
+# Access collected data
+models_data = data.models_data     # Hash of model name => model data
+tables = data.tables               # Hash of table name => columns
+models_without_tables = data.models_no_tables  # Models without DB tables
+all_models = data.models           # Array of all ActiveRecord models
+
+# Access association information
+polymorphic = data.polymorphic_associations  # All polymorphic associations
+regular = data.regular_associations          # All regular associations
+
+# Get info about a specific model
+user_model = data.get_model_data("User")
+user_model[:associations]  # Get associations for the User model
+
+# Access polymorphic interfaces
+commentable_targets = data.polymorphic_targets_for("commentable") 
+# Returns array of models implementing the 'commentable' interface
+```
+
+This interface is useful when you need to:
+- Analyze model relationships programmatically
+- Build custom visualizations or documentation
+- Perform advanced filtering before generating diagrams
+- Extract schema information for other purposes
+
 ## Viewing the Generated ERD
 
 Once you have generated the `.mmd` file, you can view it using:
