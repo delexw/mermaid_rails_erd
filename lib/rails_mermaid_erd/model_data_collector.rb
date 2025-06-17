@@ -93,7 +93,7 @@ module RailsMermaidErd
         # Extract just the base type without precision/size information
         base_type = col.sql_type.gsub(/\(.*?\)/, '')
         
-        ColumnInfo.new(base_type, col.name, annotations)
+        ColumnInfo.new(base_type, col.name, annotations, col.sql_type, col.type)
       end
     end
     
