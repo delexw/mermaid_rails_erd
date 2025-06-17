@@ -4,6 +4,7 @@ PATH
     rails_mermaid_erd (1.0.0)
       activerecord (>= 6.0)
       activesupport (>= 6.0)
+      nokogiri (~> 1.18)
       railties (>= 6.0)
 
 GEM
