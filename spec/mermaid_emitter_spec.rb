@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe RailsMermaidErd::MermaidEmitter do
   let(:output) { StringIO.new }
   let(:emitter) { described_class.new(output, tables, relationships) }
-  
+
   describe "#emit" do
     context "with tables and relationships" do
       let(:tables) do
@@ -13,23 +13,23 @@ RSpec.describe RailsMermaidErd::MermaidEmitter do
           "users" => [
             RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
             RailsMermaidErd::ColumnInfo.new("string", "email"),
-            RailsMermaidErd::ColumnInfo.new("string", "name")
+            RailsMermaidErd::ColumnInfo.new("string", "name"),
           ],
           "posts" => [
             RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
             RailsMermaidErd::ColumnInfo.new("integer", "user_id", ["FK"]),
             RailsMermaidErd::ColumnInfo.new("string", "title"),
-            RailsMermaidErd::ColumnInfo.new("text", "content")
+            RailsMermaidErd::ColumnInfo.new("text", "content"),
           ],
           "comments" => [
             RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
             RailsMermaidErd::ColumnInfo.new("integer", "post_id", ["FK"]),
             RailsMermaidErd::ColumnInfo.new("integer", "user_id", ["FK"]),
-            RailsMermaidErd::ColumnInfo.new("text", "body")
-          ]
+            RailsMermaidErd::ColumnInfo.new("text", "body"),
+          ],
         }
       end
-      
+
       let(:relationships) do
         [
           RailsMermaidErd::Relationship.new(
@@ -43,28 +43,28 @@ RSpec.describe RailsMermaidErd::MermaidEmitter do
           RailsMermaidErd::Relationship.new(
             "comments", "users", "user_id", "||--o{", nil,
             "comments", "user_id", "users", "id"
-          )
+          ),
         ]
       end
-      
+
       it "emits the ERD diagram header" do
         emitter.emit
         expect(output.string).to include("erDiagram")
       end
-      
+
       it "emits table definitions with columns" do
         emitter.emit
         expect(output.string).to include("users {")
         expect(output.string).to include("integer id")
         expect(output.string).to include("string email")
       end
-      
+
       it "includes column annotations" do
         emitter.emit
         expect(output.string).to include("integer id PK")
         expect(output.string).to include("integer user_id FK")
       end
-      
+
       it "emits relationship definitions" do
         emitter.emit
         expect(output.string).to include("posts #{relationships[0].relationship_type} users")
@@ -72,15 +72,15 @@ RSpec.describe RailsMermaidErd::MermaidEmitter do
         expect(output.string).to include("comments #{relationships[2].relationship_type} users")
       end
     end
-    
+
     context "with empty tables" do
       let(:tables) { {} }
       let(:relationships) { [] }
-      
+
       it "emits only the ERD diagram header" do
         emitter.emit
         expect(output.string.strip).to eq("erDiagram")
       end
     end
   end
-end 
+end

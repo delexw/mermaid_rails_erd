@@ -3,29 +3,29 @@
 require "rails_mermaid_erd"
 
 # Stub out ActiveRecord for tests
-if !Object.const_defined?(:ActiveRecord) || !defined?(::ActiveRecord::Base)
+if !Object.const_defined?(:ActiveRecord) || !defined?(ActiveRecord::Base)
   module ActiveRecord
     class Base
       def self.descendants
         []
       end
 
-      def self.<(other)
+      def self.<(_other)
         false
       end
 
       def self.abstract_class?
         true
       end
-      
+
       def self.table_exists?
         true
       end
-      
+
       def self.base_class
         self
       end
-      
+
       def self.connection
         nil
       end
@@ -51,4 +51,4 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
-end 
+end

@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require "fileutils"
+
+class ReleaseManager
+  VERSION_FILE = "lib/rails_mermaid_erd/version.rb"
+  CHANGELOG_FILE = "CHANGELOG.md"
+
+  def initialize
+    @options = {}
+    parse_options
+  end
+
+  def run
+    case @options[:action]
+    when "bump"
+      bump_version(@options[:version_type])
+    when "tag"
+      create_tag
+    when "release"
+      full_release(@options[:version_type])
+    else
+      puts "Unknown action: #{@options[:action]}"
+      exit 1
+    end
+  end
+
+  private
+
+  def parse_options
+    OptionParser.new do |opts|
+      opts.banner = "Usage: #{$PROGRAM_NAME} [options]"
+
+      opts.on("-a", "--action ACTION", "Action to perform (bump, tag, release)") do |action|
+        @options[:action] = action
+      end
+
+      opts.on("-t", "--type TYPE", "Version type (major, minor, patch)") do |type|
+        @options[:version_type] = type
+      end
+
+      opts.on("-h", "--help", "Show this help") do
+        puts opts
+        exit
+      end
+    end.parse!
+
+    return unless @options[:action].nil?
+
+    puts "Action required. Use -h for help."
+    exit 1
+  end
+
+  def current_version
+    version_content = File.read(VERSION_FILE)
+    version_content.match(/VERSION = ["']([^"']+)["']/)[1]
+  end
+
+  def bump_version(type)
+    current = current_version
+    parts = current.split(".").map(&:to_i)
+
+    case type
+    when "major"
+      parts[0] += 1
+      parts[1] = 0
+      parts[2] = 0
+    when "minor"
+      parts[1] += 1
+      parts[2] = 0
+    when "patch"
+      parts[2] += 1
+    else
+      puts "Invalid version type: #{type}. Use major, minor, or patch."
+      exit 1
+    end
+
+    new_version = parts.join(".")
+
+    # Update version file
+    version_content = File.read(VERSION_FILE)
+    new_content = version_content.gsub(/VERSION = ["'][^"']+["']/, "VERSION = \"#{new_version}\"")
+    File.write(VERSION_FILE, new_content)
+
+    puts "Version bumped from #{current} to #{new_version}"
+    new_version
+  end
+
+  def create_tag
+    version = current_version
+
+    # Create git tag
+    system("git add -A")
+    system("git commit -m 'Release v#{version}'")
+    system("git tag -a v#{version} -m 'Release v#{version}'")
+
+    puts "Created tag v#{version}"
+    puts "Push with: git push origin main --tags"
+  end
+
+  def full_release(type)
+    puts "Starting full release process..."
+
+    # Check if working directory is clean
+    unless system("git diff --quiet && git diff --cached --quiet")
+      puts "Working directory is not clean. Please commit or stash changes first."
+      exit 1
+    end
+
+    # Run tests
+    puts "Running tests..."
+    unless system("bundle exec rake")
+      puts "Tests failed. Aborting release."
+      exit 1
+    end
+
+    # Bump version
+    new_version = bump_version(type)
+
+    # Update changelog
+    update_changelog(new_version)
+
+    # Create tag
+    create_tag
+
+    puts "\nRelease v#{new_version} prepared!"
+    puts "To complete the release:"
+    puts "1. Review the changes: git log --oneline -10"
+    puts "2. Push to GitHub: git push origin main --tags"
+    puts "3. Create a GitHub release at: https://github.com/delexw/rails_mermaid_erd/releases/new"
+  end
+
+  def update_changelog(version)
+    return unless File.exist?(CHANGELOG_FILE)
+
+    date = Time.now.strftime("%Y-%m-%d")
+    changelog_content = File.read(CHANGELOG_FILE)
+
+    # Find the unreleased section and replace it
+    new_content = changelog_content.gsub(
+      "## [Unreleased]",
+      "## [Unreleased]\n\n## [#{version}] - #{date}",
+    )
+
+    File.write(CHANGELOG_FILE, new_content)
+    puts "Updated CHANGELOG.md with version #{version}"
+  end
+end
+
+ReleaseManager.new.run if __FILE__ == $PROGRAM_NAME

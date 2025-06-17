@@ -14,23 +14,19 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
       let(:assoc) { double("Association") }
 
       before do
-        allow(model).to receive(:table_name).and_return("users")
-        allow(model).to receive(:primary_key).and_return("id")
-        allow(assoc).to receive(:name).and_return("posts")
-        allow(assoc).to receive(:foreign_key).and_return("user_id")
-        allow(assoc).to receive(:options).and_return({})
-        allow(assoc).to receive(:macro).and_return(:has_many)
-        
+        allow(model).to receive_messages(table_name: "users", primary_key: "id")
+        allow(assoc).to receive_messages(name: "posts", foreign_key: "user_id", options: {}, macro: :has_many)
+
         to_table_info = { table_name: "posts", primary_key: "id" }
         allow(association_resolver).to receive(:resolve).with(assoc).and_return(to_table_info)
-        
+
         allow(symbol_mapper).to receive(:map).with(:has_many).and_return("||--o{")
       end
 
       it "creates a relationship with the correct attributes" do
         relationships = builder.build(model, assoc)
         expect(relationships.size).to eq(1)
-        
+
         relationship = relationships.first
         expect(relationship.from_table).to eq("posts")
         expect(relationship.to_table).to eq("users")
@@ -46,17 +42,14 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
 
       before do
         allow(model).to receive(:table_name).and_return("posts")
-        allow(assoc).to receive(:name).and_return("comments")
-        allow(assoc).to receive(:options).and_return({ as: "commentable" })
-        allow(assoc).to receive(:macro).and_return(:has_many)
-        
+
         # Mock the foreign_key method for safe_foreign_key
-        allow(assoc).to receive(:foreign_key).and_return(nil)
-        
-        # Instead of mocking resolve_association_model directly, 
+        allow(assoc).to receive_messages(name: "comments", options: { as: "commentable" }, macro: :has_many, foreign_key: nil)
+
+        # Instead of mocking resolve_association_model directly,
         # let's make sure association_resolver responds to resolve properly
         allow(association_resolver).to receive(:resolve).and_return(nil)
-        
+
         # Make sure builder calls the log_missing_table_warning method
         allow(builder).to receive(:log_missing_table_warning).and_return([])
       end
@@ -67,4 +60,4 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder
       end
     end
   end
-end 
+end

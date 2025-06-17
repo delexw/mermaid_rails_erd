@@ -7,4 +7,4 @@ require "rails_mermaid_erd"
 require "irb"
 
 puts "Loaded rails_mermaid_erd. You can now use the gem in this IRB session."
-IRB.start 
+IRB.start

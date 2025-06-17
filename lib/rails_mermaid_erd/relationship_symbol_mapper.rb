@@ -6,8 +6,8 @@ module RailsMermaidErd
       {
         has_many: "||--o{",
         has_one: "||--||",
-        belongs_to: "}o--||"
+        belongs_to: "}o--||",
       }[assoc_type] || "--"
     end
   end
-end 
+end

@@ -36,7 +36,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "railties", ">= 3.0"
 
   # Development dependencies
+  spec.add_development_dependency "bundler-audit", "~> 0.9"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "rubocop", "~> 1.0"
-end 
+  spec.add_development_dependency "rspec_junit_formatter", "~> 0.6"
+  spec.add_development_dependency "rubocop", "~> 1.50"
+  spec.add_development_dependency "rubocop-rspec", "~> 3.6.0"
+  spec.metadata["rubygems_mfa_required"] = "true"
+end

@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  RUBY_VERSION: "3.2"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["2.6", "2.7", "3.0", "3.1", "3.2", "3.3"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+      - name: Run RSpec tests
+        run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rspec-results-${{ matrix.ruby-version }}
+          path: tmp/rspec_results.xml
+
+      - name: Run RuboCop
+        run: bundle exec rubocop --format json --out tmp/rubocop_results.json
+
+      - name: Upload RuboCop results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rubocop-results-${{ matrix.ruby-version }}
+          path: tmp/rubocop_results.json
+
+  # Separate job to test gem build
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Build gem
+        run: gem build rails_mermaid_erd.gemspec
+
+      - name: Install gem locally
+        run: gem install rails_mermaid_erd-*.gem
+
+      - name: Test gem installation
+        run: |
+          ruby -e "require 'rails_mermaid_erd'; puts 'Gem loaded successfully'"
+
+      - name: Upload gem artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rails_mermaid_erd-gem
+          path: rails_mermaid_erd-*.gem
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+
+      - name: Run bundle audit
+        run: |
+          gem install bundler-audit
+          bundle-audit check --update

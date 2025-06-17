@@ -13,16 +13,16 @@ RSpec.describe RailsMermaidErd::Railtie do
         stub_const("Rails::Railtie", Class.new)
         allow(Rails::Railtie).to receive(:rake_tasks)
       end
-      
+
       # Reload the railtie code
-      load File.expand_path('../../lib/rails_mermaid_erd/railtie.rb', __FILE__)
+      load File.expand_path("../lib/rails_mermaid_erd/railtie.rb", __dir__)
     end
-    
+
     it "has rake tasks" do
-      # We can't easily test rake_tasks blocks directly in specs, 
+      # We can't easily test rake_tasks blocks directly in specs,
       # so we'll test that the file exists that the railtie loads
-      rake_file_path = File.expand_path('../../lib/tasks/rails_mermaid_erd.rake', __FILE__)
+      rake_file_path = File.expand_path("../lib/tasks/rails_mermaid_erd.rake", __dir__)
       expect(File.exist?(rake_file_path)).to be true
     end
   end
-end 
+end

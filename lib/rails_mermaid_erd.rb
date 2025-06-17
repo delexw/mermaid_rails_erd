@@ -26,10 +26,10 @@ module RailsMermaidErd
   def self.build
     Generator.new.build
   end
-  
+
   # Generate Mermaid ERD and write to output stream
   # @param output [IO] Output stream to write the ERD to
   def self.generate(output: $stdout)
     build.emit(output: output)
   end
-end 
+end

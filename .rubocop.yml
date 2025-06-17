@@ -1,0 +1,169 @@
+plugins:
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - "vendor/**/*"
+    - "pkg/**/*"
+    - "tmp/**/*"
+    - "db/schema.rb"
+    - "bin/bundle"
+    - "Gemfile.lock"
+
+# Block length is often exceeded in specs and rake tasks
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+    - "Rakefile"
+    - "**/*.rake"
+    - "*.gemspec"
+
+# Method length can be more flexible for certain files
+Metrics/MethodLength:
+  Max: 70
+  Exclude:
+    - "spec/**/*"
+    - "bin/**/*"
+
+# Class length can be more flexible
+Metrics/ClassLength:
+  Max: 120
+  Exclude:
+    - "spec/**/*"
+
+# ABC Size (Assignment Branch Condition) complexity
+Metrics/AbcSize:
+  Max: 40
+  Exclude:
+    - "spec/**/*"
+    - "bin/**/*"
+
+# Cyclomatic complexity
+Metrics/CyclomaticComplexity:
+  Max: 10
+  Exclude:
+    - "spec/**/*"
+
+# Parameter lists can be longer for configuration methods
+Metrics/ParameterLists:
+  Max: 15
+  CountKeywordArgs: false
+  MaxOptionalParameters: 10
+
+# Line length is often too restrictive
+Layout/LineLength:
+  Max: 180
+  AllowedPatterns: ['\A\s*#'] # Allow long comments
+  Exclude:
+    - "spec/**/*"
+
+# Documentation is not always necessary for every class/module
+Style/Documentation:
+  Enabled: false
+
+# Allow trailing comma in multiline collections
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+# Be flexible with string literals
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# Allow empty methods to be on single line
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+# Be more flexible with guard clauses
+Style/GuardClause:
+  MinBodyLength: 3
+
+# Allow more flexibility in conditional assignments
+Style/ConditionalAssignment:
+  Enabled: false
+
+# Allow frozen string literal comment
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# Allow class variables in certain cases
+Style/ClassVars:
+  Enabled: false
+
+# Allow boolean parameters
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+# Naming conventions - allow more flexibility
+Naming/MethodName:
+  Enabled: false
+
+Naming/VariableName:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+# Disable some lint warnings for empty classes (test stubs)
+Lint/EmptyClass:
+  Exclude:
+    - "spec/**/*"
+
+# RSpec specific configurations
+RSpec/ExampleLength:
+  Max: 30
+
+RSpec/MultipleExpectations:
+  Max: 10
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/DescribeClass:
+  Exclude:
+    - "spec/tasks/**/*"
+    - "spec/integration/**/*"
+
+# Allow normal doubles in specs
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+# Allow stubbed mocks
+RSpec/StubbedMock:
+  Enabled: false
+
+# Allow message spies
+RSpec/MessageSpies:
+  Enabled: false
+
+# Allow more memoized helpers
+RSpec/MultipleMemoizedHelpers:
+  Max: 10
+
+# Allow indexed let statements
+RSpec/IndexedLet:
+  Enabled: false
+
+# Allow file paths that don't match exact patterns
+RSpec/SpecFilePathFormat:
+  Enabled: false
+
+RSpec/SpecFilePathSuffix:
+  Enabled: false
+
+# Disable problematic Capybara cop that's causing inspection errors
+Capybara/RSpec/PredicateMatcher:
+  Enabled: false
+
+# Gemspec configuration
+Gemspec/DevelopmentDependencies:
+  Enabled: false
