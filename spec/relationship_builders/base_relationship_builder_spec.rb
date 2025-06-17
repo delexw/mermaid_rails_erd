@@ -2,10 +2,14 @@
 
 require "spec_helper"
 
+# Define a custom error class for testing
+class TestError < StandardError; end
+
 RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
-  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver) }
+  let(:model_data_collector) { double("ModelDataCollector") }
+  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver, model_data_collector: model_data_collector) }
   
   describe "#build" do
     it "raises NotImplementedError" do
@@ -27,8 +31,15 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
       expect(result).to eq(expected_result)
     end
     
-    it "handles errors and returns nil" do
-      allow(association_resolver).to receive(:resolve).with(assoc).and_raise(StandardError.new("Test error"))
+    it "handles errors, registers invalid association and returns nil" do
+      error_message = "Test error"
+      allow(association_resolver).to receive(:resolve).with(assoc).and_raise(StandardError.new(error_message))
+      
+      # Expect the model_data_collector to register the invalid association
+      expect(model_data_collector).to receive(:register_invalid_association).with(
+        model, assoc, "StandardError - #{error_message}"
+      )
+      
       result = builder.send(:resolve_association_model, model, assoc)
       expect(result).to be_nil
     end
@@ -47,19 +58,19 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
       expect(builder.send(:safe_foreign_key, model, assoc)).to eq("test_id")
     end
     
-    it "handles errors and returns nil" do
+    it "handles errors, registers invalid association and returns nil" do
       assoc = double("Association", options: {}, name: "test_assoc")
-      
-      # Define a custom error class that mimics the behavior we want to test
-      class TestError < StandardError; end
+      error = TestError.new("Foreign key error")
       
       # Use our custom error instead of NoMethodError
-      allow(assoc).to receive(:foreign_key).and_raise(TestError)
+      allow(assoc).to receive(:foreign_key).and_raise(error)
       
-      # Temporarily replace the rescue clause in the method
-      allow_any_instance_of(described_class).to receive(:safe_foreign_key).and_call_original
-      allow_any_instance_of(described_class).to receive(:safe_foreign_key).with(model, assoc).and_return(nil)
+      # Expect the model_data_collector to register the invalid association
+      expect(model_data_collector).to receive(:register_invalid_association).with(
+        model, assoc, "Cannot determine foreign key: TestError - Foreign key error"
+      )
       
+      # Explicitly call without the allow statements that were breaking our test
       expect(builder.send(:safe_foreign_key, model, assoc)).to be_nil
     end
   end
@@ -89,6 +100,58 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
       builder.send(:skip_duplicate_one_to_one?, model, assoc, to_table_info)
       # Second call should return true
       expect(builder.send(:skip_duplicate_one_to_one?, model, assoc, to_table_info)).to be true
+    end
+  end
+  
+  describe "#log_missing_table_warning" do
+    let(:model) { double("Model", name: "TestModel") }
+    let(:assoc) { double("Association", name: "test_assoc", options: {}) }
+    
+    it "registers the invalid association with the collector" do
+      reason = "table does not exist"
+      
+      # Expect the model_data_collector to register the invalid association
+      expect(model_data_collector).to receive(:register_invalid_association).with(model, assoc, reason)
+      
+      result = builder.send(:log_missing_table_warning, model, assoc, reason)
+      expect(result).to eq([])
+    end
+    
+    it "handles associations with class_name option" do
+      class_name = "CustomClass"
+      assoc = double("Association", name: "test_assoc", options: { class_name: class_name })
+      reason = "table does not exist"
+      
+      # Expect the model_data_collector to register the invalid association
+      expect(model_data_collector).to receive(:register_invalid_association).with(model, assoc, reason)
+      
+      result = builder.send(:log_missing_table_warning, model, assoc, reason)
+      expect(result).to eq([])
+    end
+  end
+  
+  describe "#register_invalid_association" do
+    let(:model) { double("Model", name: "TestModel") }
+    let(:assoc) { double("Association", name: "test_assoc") }
+    
+    it "calls register_invalid_association on model_data_collector" do
+      reason = "test reason"
+      
+      expect(model_data_collector).to receive(:register_invalid_association).with(model, assoc, reason)
+      
+      builder.send(:register_invalid_association, model, assoc, reason)
+    end
+    
+    it "doesn't fail if model_data_collector is nil" do
+      builder_without_collector = described_class.new(
+        symbol_mapper: symbol_mapper,
+        association_resolver: association_resolver
+      )
+      
+      # Should not raise an error
+      expect {
+        builder_without_collector.send(:register_invalid_association, model, assoc, "test reason")
+      }.not_to raise_error
     end
   end
 end 

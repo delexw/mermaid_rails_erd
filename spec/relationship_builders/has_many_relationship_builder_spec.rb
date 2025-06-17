@@ -5,7 +5,8 @@ require "spec_helper"
 RSpec.describe RailsMermaidErd::RelationshipBuilders::HasManyRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
-  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver) }
+  let(:model_data_collector) { double("ModelDataCollector", register_invalid_association: nil) }
+  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver, model_data_collector: model_data_collector) }
 
   describe "#build" do
     context "with standard has_many association" do

@@ -5,7 +5,8 @@ require "spec_helper"
 RSpec.describe RailsMermaidErd::RelationshipBuilders::BelongsToRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
-  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver) }
+  let(:model_data_collector) { double("ModelDataCollector", register_invalid_association: nil) }
+  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver, model_data_collector: model_data_collector) }
 
   describe "#build" do
     context "with standard belongs_to association" do
@@ -81,6 +82,16 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::BelongsToRelationshipBuild
       
       it "logs a warning and returns an empty array" do
         expect(builder).to receive(:log_missing_table_warning).with(model, assoc)
+        
+        relationships = builder.build(model, assoc)
+        expect(relationships).to be_empty
+      end
+      
+      it "registers the invalid association with the model_data_collector" do
+        expect(model_data_collector).to receive(:register_invalid_association).with(model, assoc, any_args)
+        
+        # Allow log_missing_table_warning to call through to the original method
+        allow(builder).to receive(:log_missing_table_warning).and_call_original
         
         relationships = builder.build(model, assoc)
         expect(relationships).to be_empty

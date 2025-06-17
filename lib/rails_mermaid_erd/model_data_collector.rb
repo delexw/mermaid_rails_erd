@@ -4,12 +4,13 @@ require_relative "column_info"
 
 module RailsMermaidErd
   class ModelDataCollector
-    attr_reader :models_data, :tables, :models_no_tables, :models
+    attr_reader :models_data, :tables, :models_no_tables, :models, :invalid_associations
     
     def initialize(model_loader)
       @models_data = {}
       @polymorphic_associations = []
       @regular_associations = []
+      @invalid_associations = []
       @polymorphic_targets = Hash.new { |h, k| h[k] = [] }
       @tables = {}
       @models_no_tables = {}
@@ -117,6 +118,19 @@ module RailsMermaidErd
       end
       
       @tables
+    end
+    
+        # Register an invalid association that couldn't be resolved
+    # @param model [Class] Model containing the invalid association
+    # @param assoc [ActiveRecord::Reflection::Association] Invalid association
+    # @param reason [String] Reason why the association is invalid
+    def register_invalid_association(model, assoc, reason = nil)
+      @invalid_associations << { 
+        model: model, 
+        association: assoc, 
+        reason: reason, 
+        label: "#{model.name}##{assoc.name}" 
+      }
     end
     
     private

@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
+require "set"
 require_relative "../relationship"
 
 module RailsMermaidErd
   module RelationshipBuilders
     class BaseRelationshipBuilder
-      attr_reader :symbol_mapper, :association_resolver
+      attr_reader :symbol_mapper, :association_resolver, :model_data_collector
       
       # Class variable to track one-to-one relationships across builder instances
       @@one_to_one_keys = Set.new
 
-      def initialize(symbol_mapper:, association_resolver:)
+      def initialize(symbol_mapper:, association_resolver:, model_data_collector: nil)
         @symbol_mapper = symbol_mapper
         @association_resolver = association_resolver
+        @model_data_collector = model_data_collector
       end
 
       def build(model, assoc)
@@ -29,6 +31,8 @@ module RailsMermaidErd
         rescue => e
           puts "  ERROR resolving association class for #{model.name}##{assoc.name}: #{e.class} - #{e.message}"
           puts e.backtrace.join("\n")
+          # Register invalid association if model_data_collector is available
+          register_invalid_association(model, assoc, "#{e.class} - #{e.message}")
           return nil
         end
       end
@@ -40,8 +44,9 @@ module RailsMermaidErd
         # Try to get the foreign key
         begin
           return assoc.foreign_key
-        rescue Module::DelegationError, NoMethodError => e
+        rescue => e
           puts "  WARNING: Cannot determine foreign key for #{model.name}##{assoc.name} - skipping"
+          register_invalid_association(model, assoc, "Cannot determine foreign key: #{e.class} - #{e.message}")
           return nil
         end
       end
@@ -72,7 +77,15 @@ module RailsMermaidErd
                        assoc.name.to_s.tableize
                      end
         puts "  WARNING: Could not create relationship for #{model.name}##{assoc.name} - #{reason}"
+        register_invalid_association(model, assoc, reason)
         []
+      end
+
+      private
+
+      def register_invalid_association(model, assoc, reason)
+        return unless @model_data_collector
+        @model_data_collector.register_invalid_association(model, assoc, reason)
       end
     end
   end

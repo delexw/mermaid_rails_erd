@@ -3,103 +3,120 @@
 require "spec_helper"
 
 RSpec.describe RailsMermaidErd::Generator do
-  describe "#generate" do
-    let(:output) { StringIO.new }
-    let(:generator) { described_class.new(output: output) }
-    let(:models) { [double("Model")] }
-    let(:collector) { instance_double(RailsMermaidErd::ModelDataCollector) }
-    let(:registry) { instance_double(RailsMermaidErd::RelationshipRegistry) }
-    let(:relationships) { [double("Relationship")] }
-    let(:tables) { { "table1" => double("Table1") } }
-    let(:emitter) { instance_double(RailsMermaidErd::MermaidEmitter) }
-    let(:model_loader) { instance_double(RailsMermaidErd::ModelLoader) }
-    let(:polymorphic_resolver) { double("PolymorphicResolver") }
-    let(:symbol_mapper) { double("SymbolMapper") }
-    let(:association_resolver) { double("AssociationResolver") }
-    
-    before do
-      # Mock the model loader
-      allow(RailsMermaidErd::ModelLoader).to receive(:new).and_return(model_loader)
-      allow(model_loader).to receive(:load).and_return(models)
+  let(:output) { StringIO.new }
+  
+  # Mock the ModelLoader for all tests
+  before(:each) do
+    # Create a stub ModelLoader class that doesn't need Rails
+    model_loader = double("ModelLoader", load: [])
+    allow(RailsMermaidErd::ModelLoader).to receive(:new).and_return(model_loader)
+  end
+  
+
+   
+  describe "#build" do
+    it "collects model data and relationships" do
+      # Mock the dependencies
+      model_data_collector = double("ModelDataCollector")
+      relationship_registry = double("RelationshipRegistry")
       
-      # Setup the model filtering expectations
-      allow(models[0]).to receive(:base_class).and_return(models[0])
-      allow(models[0]).to receive(:<).and_return(false)
-      allow(models[0]).to receive(:table_exists?).and_return(true)
+      # Create a valid generator instance with mocked dependencies
+      generator = described_class.new
+      generator.instance_variable_set(:@model_data_collector, model_data_collector)
+      generator.instance_variable_set(:@relationship_registry, relationship_registry)
       
-      # Mock the collector and registry
-      allow(RailsMermaidErd::ModelDataCollector).to receive(:new).with(model_loader).and_return(collector)
-      allow(RailsMermaidErd::PolymorphicTargetsResolver).to receive(:new).and_return(polymorphic_resolver)
-      allow(polymorphic_resolver).to receive(:model_data_collector).and_return(collector)
+      # Mock the behavior
+      expect(model_data_collector).to receive(:collect).and_return(model_data_collector)
+      expect(relationship_registry).to receive(:build_all_relationships).and_return([])
+      expect(model_data_collector).to receive(:update_foreign_keys).with([]).and_return({})
       
-      allow(RailsMermaidErd::RelationshipSymbolMapper).to receive(:new).and_return(symbol_mapper)
-      allow(RailsMermaidErd::AssociationResolver).to receive(:new).and_return(association_resolver)
-      
-      allow(RailsMermaidErd::RelationshipRegistry).to receive(:new).with(
-        symbol_mapper: symbol_mapper,
-        association_resolver: association_resolver,
-        polymorphic_resolver: polymorphic_resolver,
-        printed_tables: instance_of(Set),
-        model_data_collector: collector
-      ).and_return(registry)
-      
-      # Set up collector expectations
-      allow(collector).to receive(:collect).and_return(collector)
-      allow(collector).to receive(:update_foreign_keys).with(relationships).and_return(tables)
-      
-      # Set up registry expectations
-      allow(registry).to receive(:build_all_relationships).and_return(relationships)
-      
-      # Mock the emitter
-      allow(RailsMermaidErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
-      allow(emitter).to receive(:emit)
+      # Verify the method returns self
+      expect(generator.build).to eq(generator)
     end
     
-    it "collects model data" do
-      expect(collector).to receive(:collect)
+    it "handles exceptions during relationship building" do
+      # Mock the dependencies
+      model_data_collector = double("ModelDataCollector")
+      relationship_registry = double("RelationshipRegistry")
       
-      generator.generate
-    end
-    
-    it "builds relationships from associations" do
-      expect(registry).to receive(:build_all_relationships)
+      # Create a valid generator instance with mocked dependencies
+      generator = described_class.new
+      generator.instance_variable_set(:@model_data_collector, model_data_collector)
+      generator.instance_variable_set(:@relationship_registry, relationship_registry)
       
-      generator.generate
-    end
-    
-    it "updates foreign keys on the collector" do
-      expect(collector).to receive(:update_foreign_keys).with(relationships)
+      # Mock the error behavior
+      expect(model_data_collector).to receive(:collect)
+      expect(relationship_registry).to receive(:build_all_relationships).and_raise(StandardError.new("Test error"))
+      expect(model_data_collector).to receive(:update_foreign_keys).with([]).and_return({})
       
-      generator.generate
+      # Should not raise an error
+              expect { generator.build }.not_to raise_error
+      
+      # Should set relationships to an empty array in parsed_data
+      expect(generator.parsed_data.relationships).to eq([])
     end
-    
-    it "emits the ERD diagram through the MermaidEmitter" do
+  end
+  
+  describe "#emit" do
+    it "creates a MermaidEmitter with the collected data" do
+      generator = described_class.new
+      tables = { "users" => [] }
+      relationships = [double("Relationship")]
+      output = StringIO.new
+      
+      generator.instance_variable_set(:@tables, tables)
+      generator.instance_variable_set(:@relationships, relationships)
+      
+      emitter = double("MermaidEmitter")
       expect(RailsMermaidErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
       expect(emitter).to receive(:emit)
       
-      generator.generate
+      generator.emit(output: output)
     end
     
-    it "passes custom output to the emitter" do
-      custom_output = StringIO.new
-      custom_generator = described_class.new(output: custom_output)
+    it "uses the output from initialization if none is provided" do
+      output = StringIO.new
+      generator = described_class.new(output: output)
+      tables = { "users" => [] }
+      relationships = [double("Relationship")]
       
-      expect(RailsMermaidErd::MermaidEmitter).to receive(:new).with(custom_output, tables, relationships).and_return(emitter)
+      generator.instance_variable_set(:@tables, tables)
+      generator.instance_variable_set(:@relationships, relationships)
       
-      allow(RailsMermaidErd::ModelLoader).to receive(:new).and_return(model_loader)
-      allow(RailsMermaidErd::ModelDataCollector).to receive(:new).with(model_loader).and_return(collector)
-      allow(RailsMermaidErd::PolymorphicTargetsResolver).to receive(:new).and_return(polymorphic_resolver)
-      allow(RailsMermaidErd::RelationshipSymbolMapper).to receive(:new).and_return(symbol_mapper)
-      allow(RailsMermaidErd::AssociationResolver).to receive(:new).and_return(association_resolver)
-      allow(RailsMermaidErd::RelationshipRegistry).to receive(:new).with(
-        symbol_mapper: symbol_mapper,
-        association_resolver: association_resolver,
-        polymorphic_resolver: polymorphic_resolver,
-        printed_tables: instance_of(Set),
-        model_data_collector: collector
-      ).and_return(registry)
+      emitter = double("MermaidEmitter")
+      expect(RailsMermaidErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
+      expect(emitter).to receive(:emit)
       
-      custom_generator.generate
+      generator.emit
+    end
+  end
+  
+  describe "#parsed_data" do
+    it "returns a ParsedData struct with delegated methods" do
+      generator = described_class.new
+      
+      # Mock the build process
+      allow(generator).to receive(:build).and_return(generator)
+      relationships = [double("Relationship")]
+      tables = { "users" => [double("Column")] }
+      
+      # Build the data first
+      generator.instance_variable_set(:@relationships, relationships)
+      generator.instance_variable_set(:@tables, tables)
+      
+      parsed_data = generator.parsed_data
+      
+      expect(parsed_data).to be_a(RailsMermaidErd::ParsedData)
+      expect(parsed_data.relationships).to eq(relationships)
+      expect(parsed_data.tables).to eq(tables)
+      
+      # Test delegation to model_data_collector
+      expect(parsed_data).to respond_to(:invalid_associations)
+      expect(parsed_data).to respond_to(:models_data)
+      expect(parsed_data).to respond_to(:models_no_tables)
+      expect(parsed_data).to respond_to(:models)
+      expect(parsed_data).to respond_to(:polymorphic_associations)
+      expect(parsed_data).to respond_to(:regular_associations)
     end
   end
 end 

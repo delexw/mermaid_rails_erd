@@ -6,7 +6,8 @@ RSpec.describe RailsMermaidErd::RelationshipBuilders::HasAndBelongsToManyRelatio
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
   let(:printed_tables) { Set.new }
-  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver, printed_tables: printed_tables) }
+  let(:model_data_collector) { double("ModelDataCollector", register_invalid_association: nil) }
+  let(:builder) { described_class.new(symbol_mapper: symbol_mapper, association_resolver: association_resolver, printed_tables: printed_tables, model_data_collector: model_data_collector) }
 
   describe "#build" do
     context "with standard HABTM association" do

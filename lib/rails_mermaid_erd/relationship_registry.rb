@@ -23,20 +23,24 @@ module RailsMermaidErd
       @builders = {
         belongs_to: RelationshipBuilders::BelongsToRelationshipBuilder.new(
           symbol_mapper: symbol_mapper, 
-          association_resolver: association_resolver
+          association_resolver: association_resolver,
+          model_data_collector: model_data_collector
         ),
         has_many: RelationshipBuilders::HasManyRelationshipBuilder.new(
           symbol_mapper: symbol_mapper, 
-          association_resolver: association_resolver
+          association_resolver: association_resolver,
+          model_data_collector: model_data_collector
         ),
         has_one: RelationshipBuilders::HasOneRelationshipBuilder.new(
           symbol_mapper: symbol_mapper, 
-          association_resolver: association_resolver
+          association_resolver: association_resolver,
+          model_data_collector: model_data_collector
         ),
         has_and_belongs_to_many: RelationshipBuilders::HasAndBelongsToManyRelationshipBuilder.new(
           symbol_mapper: symbol_mapper, 
           association_resolver: association_resolver,
-          printed_tables: printed_tables
+          printed_tables: printed_tables,
+          model_data_collector: model_data_collector
         )
       }
     end

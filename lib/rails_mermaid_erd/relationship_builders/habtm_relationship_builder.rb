@@ -6,8 +6,8 @@ require_relative "../relationship"
 module RailsMermaidErd
   module RelationshipBuilders
     class HasAndBelongsToManyRelationshipBuilder < BaseRelationshipBuilder
-      def initialize(symbol_mapper:, association_resolver:, printed_tables: Set.new)
-        super(symbol_mapper: symbol_mapper, association_resolver: association_resolver)
+      def initialize(symbol_mapper:, association_resolver:, printed_tables: Set.new, model_data_collector: nil)
+        super(symbol_mapper: symbol_mapper, association_resolver: association_resolver, model_data_collector: model_data_collector)
         @printed_tables = printed_tables
       end
 
@@ -39,12 +39,14 @@ module RailsMermaidErd
           source_fk = assoc.foreign_key
         rescue => e
           puts "  WARNING: Could not determine foreign key for #{model.name} in HABTM: #{e.message}"
+          register_invalid_association(model, assoc, "Could not determine foreign key: #{e.message}")
         end
         
         begin
           target_fk = assoc.association_foreign_key
         rescue => e
           puts "  WARNING: Could not determine association foreign key for #{model.name}##{assoc.name}: #{e.message}"
+          register_invalid_association(model, assoc, "Could not determine association foreign key: #{e.message}")
         end
         
         # Skip if we couldn't determine both foreign keys

@@ -93,6 +93,41 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
     end
   end
   
+  describe "#register_invalid_association" do
+    let(:test_model) { double("TestModel", name: "TestModel") }
+    let(:test_assoc) { double("TestAssoc", name: "test_assoc") }
+    
+    it "adds invalid association to the tracker" do
+      reason = "table does not exist"
+      
+      expect(collector.invalid_associations).to be_empty
+      
+      collector.register_invalid_association(test_model, test_assoc, reason)
+      
+      expect(collector.invalid_associations).not_to be_empty
+      expect(collector.invalid_associations.size).to eq(1)
+      
+      invalid_assoc = collector.invalid_associations.first
+      expect(invalid_assoc[:model]).to eq(test_model)
+      expect(invalid_assoc[:association]).to eq(test_assoc)
+      expect(invalid_assoc[:reason]).to eq(reason)
+    end
+    
+    it "allows registering multiple invalid associations" do
+      collector.register_invalid_association(test_model, test_assoc, "reason 1")
+      collector.register_invalid_association(test_model, double("AnotherAssoc"), "reason 2")
+      
+      expect(collector.invalid_associations.size).to eq(2)
+    end
+    
+    it "accepts nil reason" do
+      collector.register_invalid_association(test_model, test_assoc)
+      
+      invalid_assoc = collector.invalid_associations.first
+      expect(invalid_assoc[:reason]).to be_nil
+    end
+  end
+  
   describe "#update_foreign_keys" do
     it "adds FK annotations to foreign key columns" do
       # Set up a table with columns

@@ -21,9 +21,15 @@ require_relative "rails_mermaid_erd/railtie" if defined?(Rails)
 module RailsMermaidErd
   class Error < StandardError; end
 
+  # Build and return a Generator instance with all data collected
+  # @return [Generator] Generator instance with collected data
+  def self.build
+    Generator.new.build
+  end
+  
   # Generate Mermaid ERD and write to output stream
   # @param output [IO] Output stream to write the ERD to
   def self.generate(output: $stdout)
-    Generator.new(output: output).generate
+    build.emit(output: output)
   end
 end 
