@@ -32,8 +32,8 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
     allow(model).to receive(:primary_key).and_return("id")
     
     table_model = double("TableModel")
-    id_column = double("IdColumn", name: "id", sql_type: "integer")
-    name_column = double("NameColumn", name: "name", sql_type: "varchar(255)")
+    id_column = double("IdColumn", name: "id", sql_type: "integer", type: :integer, null: false)
+    name_column = double("NameColumn", name: "name", sql_type: "varchar(255)", type: :string, null: true)
     allow(table_model).to receive(:reflect_on_all_associations).and_return([])
     allow(table_model).to receive(:name).and_return("TableModel")
     allow(table_model).to receive(:base_class).and_return(Object)
@@ -91,6 +91,22 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
       expect(name_col_info).not_to be_nil
       expect(name_col_info.type).to eq("varchar")
     end
+
+    it "collects isNullable for table columns" do
+      # Collect the model data
+      collector.collect
+      
+      # Verify isNullable was collected
+      id_col_info = collector.tables["table_models"].find { |col| col.name == "id" }
+      expect(id_col_info).not_to be_nil
+      expect(id_col_info.isNullable).to eq(false)
+      expect(id_col_info.annotations).not_to include("NOT NULL")
+      
+      name_col_info = collector.tables["table_models"].find { |col| col.name == "name" }
+      expect(name_col_info).not_to be_nil
+      expect(name_col_info.isNullable).to eq(true)
+      expect(name_col_info.annotations).not_to include("NULL")
+    end
   end
   
   describe "#register_invalid_association" do
@@ -115,7 +131,7 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
     
     it "allows registering multiple invalid associations" do
       collector.register_invalid_association(test_model, test_assoc, "reason 1")
-      collector.register_invalid_association(test_model, double("AnotherAssoc"), "reason 2")
+      collector.register_invalid_association(test_model, double("AnotherAssoc", name: "another_assoc"), "reason 2")
       
       expect(collector.invalid_associations.size).to eq(2)
     end
@@ -132,8 +148,8 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
     it "adds FK annotations to foreign key columns" do
       # Set up a table with columns
       model = double("Model")
-      id_column = double("IdColumn", name: "id", sql_type: "integer")
-      fk_column = double("FkColumn", name: "user_id", sql_type: "integer")
+      id_column = double("IdColumn", name: "id", sql_type: "integer", type: :integer, null: false)
+      fk_column = double("FkColumn", name: "user_id", sql_type: "integer", type: :integer, null: false)
       
       # Table collection setup
       allow(model).to receive(:reflect_on_all_associations).and_return([])

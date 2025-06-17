@@ -17,5 +17,28 @@ RSpec.describe RailsMermaidErd::ColumnInfo do
       
       expect(column_info.annotations).to eq([])
     end
+    
+    it "sets isNullable when provided" do
+      column_info = described_class.new("varchar", "email", [], "varchar(255)", :string, true)
+      
+      expect(column_info.isNullable).to eq(true)
+    end
+    
+    it "sets isNullable to nil when not provided" do
+      column_info = described_class.new("varchar", "email")
+      
+      expect(column_info.isNullable).to be_nil
+    end
+    
+    it "sets all attributes including isNullable" do
+      column_info = described_class.new("integer", "user_id", ["FK"], "int(11)", :integer, false)
+      
+      expect(column_info.name).to eq("user_id")
+      expect(column_info.type).to eq("integer")
+      expect(column_info.annotations).to eq(["FK"])
+      expect(column_info.raw_sql_type).to eq("int(11)")
+      expect(column_info.activerecord_type).to eq(:integer)
+      expect(column_info.isNullable).to eq(false)
+    end
   end
 end 

@@ -12,8 +12,6 @@ A Ruby gem that generates [Mermaid.js](https://mermaid.js.org/) Entity Relations
 - 🚀 **Simple Integration**: Easy-to-use Rake task for generating diagrams
 - 🔗 **Relationship Mapping**: Supports `belongs_to`, `has_one`, `has_many`, and `has_and_belongs_to_many` associations
 - 💫 **Polymorphic Support**: Accurately discovers and maps polymorphic relationships
-- 📱 **Multiple Output Options**: Generate files or output to any IO stream
-- ✅ **Rails 3+ Support**: Compatible with ActiveRecord 3.0 and above
 
 ## Installation
 
@@ -50,86 +48,34 @@ This will:
 2. Generate a Mermaid ERD file at `tmp/erd.mmd`
 3. Provide instructions on how to view the diagram
 
-### Programmatic Usage
-
-You can also generate ERDs programmatically:
-
-```ruby
-# Generate to stdout
-RailsMermaidErd.generate
-
-# Generate to a file
-File.open('my_erd.mmd', 'w') do |file|
-  RailsMermaidErd.generate(output: file)
-end
-
-# Generate to a string
-require 'stringio'
-output = StringIO.new
-RailsMermaidErd.generate(output: output)
-erd_content = output.string
-```
 
 ### Advanced Usage: Model Data Interface
 
-You can access the collected model and relationship data directly using the `ModelDataCollector` class:
+You can access the collected model and relationship data directly without generating a diagram:
+
+#### Simple Data Collection
 
 ```ruby
-# Get collected model data without generating a diagram
-model_loader = RailsMermaidErd::ModelLoader.new
-collector = RailsMermaidErd::ModelDataCollector.new(model_loader)
-data = collector.collect
+# Get all collected data in a structured format
+data = RailsMermaidErd.build.parsed_data
 
 # Access collected data
-models_data = data.models_data     # Hash of model name => model data
-tables = data.tables               # Hash of table name => columns
-models_without_tables = data.models_no_tables  # Models without DB tables
-all_models = data.models           # Array of all ActiveRecord models
+models_data = data.models_data                           # Hash of models having table keyed by model name
+models = data.models                                     # Array of all loaded models
+models_no_tables = data.models_no_tables                 # Array of models missing tables
+relationships = data.relationships                       # Array of relationship objects
+invalid_associations = data.invalid_associations         # Array of associations missing associated table
+polymorphic_associations = data.polymorphic_associations # Array of polymorphic associations
+regular_associations = data.regular_associations         # Array of regular (non-polymorphic) associations
 
-# Access association information
-polymorphic = data.polymorphic_associations  # All polymorphic associations
-regular = data.regular_associations          # All regular associations
-
-# Get info about a specific model
-user_model = data.get_model_data("User")
-user_model[:associations]  # Get associations for the User model
-
-# Access polymorphic interfaces
-commentable_targets = data.polymorphic_targets_for("commentable") 
-# Returns array of models implementing the 'commentable' interface
 ```
-
-This interface is useful when you need to:
-- Analyze model relationships programmatically
-- Build custom visualizations or documentation
-- Perform advanced filtering before generating diagrams
-- Extract schema information for other purposes
 
 ## Viewing the Generated ERD
 
 Once you have generated the `.mmd` file, you can view it using:
 
-1. **Mermaid Live Editor**: Copy the content and paste it into [https://mermaid.live/](https://mermaid.live/)
-2. **GitHub/GitLab**: Include the mermaid code block in your markdown files:
-   ````markdown
-   ```mermaid
-   erDiagram
-     users {
-       bigint id PK
-       varchar(255) email NOT NULL
-       varchar(255) name NOT NULL
-     }
-     posts {
-       bigint id PK
-       bigint user_id NOT NULL
-       varchar(255) title NOT NULL
-       text content
-     }
-     users ||--o{ posts : "user_id"
-   ```
-   ````
-3. **VS Code**: Use the [Mermaid Preview extension](https://marketplace.visualstudio.com/items?itemName=bierner.markdown-mermaid)
-4. **Documentation Sites**: Many documentation platforms support Mermaid diagrams
+- **Mermaid ERD Visulizer**: https://github.com/delexw/mermaid-erd-visualizer
+
 
 ## Example Output
 
@@ -161,35 +107,35 @@ The gem will generate:
 erDiagram
   users {
     bigint id PK
-    varchar email NOT NULL
-    varchar name NOT NULL
-    timestamp created_at NOT NULL
-    timestamp updated_at NOT NULL
+    varchar email
+    varchar name
+    timestamp created_at
+    timestamp updated_at
   }
   
   posts {
     bigint id PK
-    bigint user_id NOT NULL
-    varchar title NOT NULL
+    bigint user_id
+    varchar title
     text content
-    timestamp created_at NOT NULL
-    timestamp updated_at NOT NULL
+    timestamp created_at
+    timestamp updated_at
   }
   
   comments {
     bigint id PK
-    bigint post_id NOT NULL
-    text content NOT NULL
-    timestamp created_at NOT NULL
-    timestamp updated_at NOT NULL
+    bigint post_id
+    text content
+    timestamp created_at
+    timestamp updated_at
   }
   
   profiles {
     bigint id PK
-    bigint user_id NOT NULL
+    bigint user_id
     text bio
-    timestamp created_at NOT NULL
-    timestamp updated_at NOT NULL
+    timestamp created_at
+    timestamp updated_at
   }
   
   users ||--o{ posts : "user_id"
@@ -225,10 +171,6 @@ The ERD will correctly show relationships between `comments` and both `posts` an
 - **has_and_belongs_to_many**: Generates many-to-many relationships
 - **polymorphic**: Discovers and maps all polymorphic interfaces
 
-## Column Types
-
-The gem uses actual database SQL column types in the ERD output (e.g., `bigint`, `varchar`, `text`, `boolean`, `timestamp`, etc.). This provides the most accurate representation of your actual database schema.
-
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -237,7 +179,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/yourusername/rails_mermaid_erd.
+Bug reports and pull requests are welcome on GitHub at https://github.com/delexw/rails_mermaid_erd.
 
 ## License
 

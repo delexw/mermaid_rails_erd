@@ -13,7 +13,7 @@ module RailsMermaidErd
       @invalid_associations = []
       @polymorphic_targets = Hash.new { |h, k| h[k] = [] }
       @tables = {}
-      @models_no_tables = {}
+      @models_no_tables = []
       @models = model_loader.load
     end
     
@@ -42,7 +42,7 @@ module RailsMermaidErd
       end
 
       (base_models & models_without_tables).each do |model|
-        @models_no_tables[model.name] = { model: model }
+        @models_no_tables << model
       end
       
       self
@@ -93,7 +93,7 @@ module RailsMermaidErd
         # Extract just the base type without precision/size information
         base_type = col.sql_type.gsub(/\(.*?\)/, '')
         
-        ColumnInfo.new(base_type, col.name, annotations, col.sql_type, col.type)
+        ColumnInfo.new(base_type, col.name, annotations, col.sql_type, col.type, col.null)
       end
     end
     

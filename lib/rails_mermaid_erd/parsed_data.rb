@@ -23,7 +23,7 @@ module RailsMermaidErd
       model_data_collector.models_data
     end
     
-    # @return [Hash] Hash of models without tables keyed by model name  
+    # @return [Array] Array of models without tables
     def models_no_tables
       model_data_collector.models_no_tables
     end
