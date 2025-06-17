@@ -1,7 +1,7 @@
 # Rails Mermaid ERD
 
 [![Gem Version](https://badge.fury.io/rb/rails_mermaid_erd.svg)](https://badge.fury.io/rb/rails_mermaid_erd)
-[![Ruby](https://github.com/yourusername/rails_mermaid_erd/workflows/Ruby/badge.svg)](https://github.com/yourusername/rails_mermaid_erd/actions)
+[![Ruby](https://github.com/yourusername/rails_mermaid_erd/workflows/Ruby/badge.svg)](https://github.com/delexw/rails_mermaid_erd/actions)
 
 A Ruby gem that generates [Mermaid.js](https://mermaid.js.org/) Entity Relationship Diagrams (ERD) from ActiveRecord models in Rails applications.
 

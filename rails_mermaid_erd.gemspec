@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "A Ruby gem that introspects ActiveRecord models and generates Mermaid.js ERD syntax for visualizing database relationships in Rails applications."
   spec.homepage      = "https://github.com/delexw/rails_mermaid_erd"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.6.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.1.0")
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
   spec.metadata["homepage_uri"] = spec.homepage
@@ -31,9 +31,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Dependencies
-  spec.add_dependency "activerecord", ">= 3.0"
-  spec.add_dependency "activesupport", ">= 3.0"
-  spec.add_dependency "railties", ">= 3.0"
+  spec.add_dependency "activerecord", ">= 6.0"
+  spec.add_dependency "activesupport", ">= 6.0"
+  spec.add_dependency "railties", ">= 6.0"
 
   # Development dependencies
   spec.add_development_dependency "bundler-audit", "~> 0.9"
