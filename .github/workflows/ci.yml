@@ -60,20 +60,20 @@ jobs:
           bundler-cache: true
 
       - name: Build gem
-        run: gem build rails_mermaid_erd.gemspec
+        run: gem build mermaid_rails_erd.gemspec
 
       - name: Install gem locally
-        run: gem install rails_mermaid_erd-*.gem
+        run: gem install mermaid_rails_erd-*.gem
 
       - name: Test gem installation
         run: |
-          ruby -e "require 'rails_mermaid_erd'; puts 'Gem loaded successfully'"
+          ruby -e "require 'mermaid_rails_erd'; puts 'Gem loaded successfully'"
 
       - name: Upload gem artifact
         uses: actions/upload-artifact@v4
         with:
-          name: rails_mermaid_erd-gem
-          path: rails_mermaid_erd-*.gem
+          name: mermaid_rails_erd-gem
+          path: mermaid_rails_erd-*.gem
 
   security:
     runs-on: ubuntu-latest
