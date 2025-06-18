@@ -1,6 +1,6 @@
 # Release Process Guide
 
-This document outlines the manual release process for the `rails_mermaid_erd` gem.
+This document outlines the manual release process for the `mermaid_rails_erd` gem.
 
 ## Overview
 
@@ -43,7 +43,7 @@ The `bin/release` script automates version management:
 
 The script will:
 1. Run tests to ensure quality
-2. Bump the version in `lib/rails_mermaid_erd/version.rb`
+2. Bump the version in `lib/mermaid_rails_erd/version.rb`
 3. Update `CHANGELOG.md` (if it exists)
 4. Create a git commit and tag
 5. Provide instructions for completing the release
@@ -76,8 +76,8 @@ After running the script, you'll need to:
 
 4. **Build and Test Gem**
    ```bash
-   gem build rails_mermaid_erd.gemspec
-   gem install rails_mermaid_erd-*.gem --local
+   gem build mermaid_rails_erd.gemspec
+   gem install mermaid_rails_erd-*.gem --local
    ```
 
 5. **Commit and Tag**
@@ -90,7 +90,7 @@ After running the script, you'll need to:
 
 6. **Publish to RubyGems**
    ```bash
-   gem push rails_mermaid_erd-*.gem
+   gem push mermaid_rails_erd-*.gem
    ```
    You'll be prompted for your OTP code during this step.
 
@@ -107,9 +107,9 @@ Before releasing, ensure:
 
 - [ ] All tests pass locally: `bundle exec rspec`
 - [ ] Code style is correct: `bundle exec rubocop`
-- [ ] Version is updated in `lib/rails_mermaid_erd/version.rb`
+- [ ] Version is updated in `lib/mermaid_rails_erd/version.rb`
 - [ ] Changelog is updated (if applicable)
-- [ ] Gem builds successfully: `gem build rails_mermaid_erd.gemspec`
+- [ ] Gem builds successfully: `gem build mermaid_rails_erd.gemspec`
 - [ ] You have your RubyGems OTP device ready
 
 ## Monitoring
@@ -119,8 +119,8 @@ Before releasing, ensure:
 - Ensure all tests pass before proceeding with release
 
 ### Release Verification
-- Check [RubyGems.org](https://rubygems.org/gems/rails_mermaid_erd) to confirm publication
-- Verify the gem can be installed: `gem install rails_mermaid_erd`
+- Check [RubyGems.org](https://rubygems.org/gems/mermaid_rails_erd) to confirm publication
+- Verify the gem can be installed: `gem install mermaid_rails_erd`
 - Test the gem in a sample Rails application
 
 ## Troubleshooting
@@ -138,16 +138,16 @@ Before releasing, ensure:
 3. **Version Already Exists**
    - Bump to a higher version number
    - Each release must have a unique version
-   - Check existing versions: `gem list rails_mermaid_erd -r`
+   - Check existing versions: `gem list mermaid_rails_erd -r`
 
 4. **Permissions Error**
    - Ensure you have push access to RubyGems for this gem
-   - Check that you're listed as an owner: `gem owner rails_mermaid_erd`
+   - Check that you're listed as an owner: `gem owner mermaid_rails_erd`
 
 5. **Gem Build Fails**
    - Check the gemspec file for errors
    - Ensure all required files are included
-   - Test locally: `gem build rails_mermaid_erd.gemspec`
+   - Test locally: `gem build mermaid_rails_erd.gemspec`
 
 ### Getting Help
 
