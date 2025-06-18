@@ -50,7 +50,7 @@ This will:
 
 ### Viewing the Generated ERD
 
-Once you have generated the `.mmd` file, you can view it using the recommended viwer below with better interactive:
+Once you have generated the `.mmd` file, you can view it using the recommended viewer with better interactive below:
 
 - **Mermaid ERD Visulizer**: https://github.com/delexw/mermaid-erd-visualizer
 
