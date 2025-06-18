@@ -48,6 +48,12 @@ This will:
 2. Generate a Mermaid ERD file at `tmp/erd.mmd`
 3. Provide instructions on how to view the diagram
 
+### Viewing the Generated ERD
+
+Once you have generated the `.mmd` file, you can view it using the recommended viwer below with better interactive:
+
+- **Mermaid ERD Visulizer**: https://github.com/delexw/mermaid-erd-visualizer
+
 
 ### Advanced Usage: Model Data Interface
 
@@ -69,12 +75,6 @@ polymorphic_associations = data.polymorphic_associations # Array of polymorphic 
 regular_associations = data.regular_associations         # Array of regular (non-polymorphic) associations
 
 ```
-
-## Viewing the Generated ERD
-
-Once you have generated the `.mmd` file, you can view it using:
-
-- **Mermaid ERD Visulizer**: https://github.com/delexw/mermaid-erd-visualizer
 
 
 ## Example Output
