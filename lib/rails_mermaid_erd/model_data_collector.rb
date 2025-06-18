@@ -82,10 +82,7 @@ module RailsMermaidErd
         annotations = []
         annotations << "PK" if col.name == model.primary_key
 
-        # Extract just the base type without precision/size information
-        base_type = col.sql_type.gsub(/\(.*?\)/, "")
-
-        ColumnInfo.new(base_type, col.name, annotations, col.sql_type, col.type, col.null)
+        ColumnInfo.new(col.name, annotations, col.sql_type, col.type, col.null)
       end
     end
 

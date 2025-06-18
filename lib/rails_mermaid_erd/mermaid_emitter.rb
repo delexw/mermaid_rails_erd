@@ -15,7 +15,7 @@ module RailsMermaidErd
         @output.puts "    #{table_name} {"
         columns.each do |col|
           annotations = col.annotations.empty? ? "" : " #{col.annotations.join(' ')}"
-          @output.puts "        #{col.type} #{col.name}#{annotations}"
+          @output.puts "        #{col.activerecord_type} #{col.name}#{annotations}"
         end
         @output.puts "    }"
       end

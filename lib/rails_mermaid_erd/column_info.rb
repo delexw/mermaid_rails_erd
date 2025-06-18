@@ -2,10 +2,9 @@
 
 module RailsMermaidErd
   class ColumnInfo
-    attr_reader :type, :name, :annotations, :raw_sql_type, :activerecord_type, :isNullable
+    attr_reader :name, :annotations, :raw_sql_type, :activerecord_type, :isNullable
 
-    def initialize(type, name, annotations = [], raw_sql_type = nil, activerecord_type = nil, isNullable = nil)
-      @type = type
+    def initialize(name, annotations = [], raw_sql_type = nil, activerecord_type = nil, isNullable = nil)
       @name = name
       @annotations = annotations
       @raw_sql_type = raw_sql_type

@@ -68,7 +68,7 @@ RSpec.describe RailsMermaidErd::ModelDataCollector do
 
       name_col_info = collector.tables["table_models"].find { |col| col.name == "name" }
       expect(name_col_info).not_to be_nil
-      expect(name_col_info.type).to eq("varchar")
+      expect(name_col_info.raw_sql_type).to eq("varchar(255)")
     end
 
     it "collects isNullable for table columns" do

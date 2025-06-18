@@ -11,21 +11,21 @@ RSpec.describe RailsMermaidErd::MermaidEmitter do
       let(:tables) do
         {
           "users" => [
-            RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
-            RailsMermaidErd::ColumnInfo.new("string", "email"),
-            RailsMermaidErd::ColumnInfo.new("string", "name"),
+            RailsMermaidErd::ColumnInfo.new("id", ["PK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("email", [], "varchar(255)", :string),
+            RailsMermaidErd::ColumnInfo.new("name", [], "varchar(255)", :string),
           ],
           "posts" => [
-            RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
-            RailsMermaidErd::ColumnInfo.new("integer", "user_id", ["FK"]),
-            RailsMermaidErd::ColumnInfo.new("string", "title"),
-            RailsMermaidErd::ColumnInfo.new("text", "content"),
+            RailsMermaidErd::ColumnInfo.new("id", ["PK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("user_id", ["FK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("title", [], "varchar(255)", :string),
+            RailsMermaidErd::ColumnInfo.new("content", [], "text", :text),
           ],
           "comments" => [
-            RailsMermaidErd::ColumnInfo.new("integer", "id", ["PK"]),
-            RailsMermaidErd::ColumnInfo.new("integer", "post_id", ["FK"]),
-            RailsMermaidErd::ColumnInfo.new("integer", "user_id", ["FK"]),
-            RailsMermaidErd::ColumnInfo.new("text", "body"),
+            RailsMermaidErd::ColumnInfo.new("id", ["PK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("post_id", ["FK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("user_id", ["FK"], "int(11)", :integer),
+            RailsMermaidErd::ColumnInfo.new("body", [], "text", :text),
           ],
         }
       end
