@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   class ColumnInfo
     attr_reader :name, :annotations, :raw_sql_type, :activerecord_type, :isNullable
 

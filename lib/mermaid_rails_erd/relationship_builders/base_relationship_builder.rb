@@ -3,7 +3,7 @@
 require "set"
 require_relative "../relationship"
 
-module RailsMermaidErd
+module MermaidRailsErd
   module RelationshipBuilders
     class BaseRelationshipBuilder
       attr_reader :symbol_mapper, :association_resolver, :model_data_collector

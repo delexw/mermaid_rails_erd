@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::Generator do
+RSpec.describe MermaidRailsErd::Generator do
   let(:output) { StringIO.new }
 
   # Mock the ModelLoader for all tests
   before do
     # Create a stub ModelLoader class that doesn't need Rails
     model_loader = double("ModelLoader", load: [])
-    allow(RailsMermaidErd::ModelLoader).to receive(:new).and_return(model_loader)
+    allow(MermaidRailsErd::ModelLoader).to receive(:new).and_return(model_loader)
   end
 
   describe "#build" do
@@ -66,7 +66,7 @@ RSpec.describe RailsMermaidErd::Generator do
       generator.instance_variable_set(:@relationships, relationships)
 
       emitter = double("MermaidEmitter")
-      expect(RailsMermaidErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
+      expect(MermaidRailsErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
       expect(emitter).to receive(:emit)
 
       generator.emit(output: output)
@@ -82,7 +82,7 @@ RSpec.describe RailsMermaidErd::Generator do
       generator.instance_variable_set(:@relationships, relationships)
 
       emitter = double("MermaidEmitter")
-      expect(RailsMermaidErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
+      expect(MermaidRailsErd::MermaidEmitter).to receive(:new).with(output, tables, relationships).and_return(emitter)
       expect(emitter).to receive(:emit)
 
       generator.emit
@@ -104,7 +104,7 @@ RSpec.describe RailsMermaidErd::Generator do
 
       parsed_data = generator.parsed_data
 
-      expect(parsed_data).to be_a(RailsMermaidErd::ParsedData)
+      expect(parsed_data).to be_a(MermaidRailsErd::ParsedData)
       expect(parsed_data.relationships).to eq(relationships)
       expect(parsed_data.tables).to eq(tables)
 

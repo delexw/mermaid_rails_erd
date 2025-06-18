@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::ColumnInfo do
+RSpec.describe MermaidRailsErd::ColumnInfo do
   describe "#initialize" do
     it "sets attributes from parameters" do
       column_info = described_class.new("id", ["PK"])

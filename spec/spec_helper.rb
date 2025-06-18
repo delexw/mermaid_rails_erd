@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rails_mermaid_erd"
+require "mermaid_rails_erd"
 
 # Stub out ActiveRecord for tests
 if !Object.const_defined?(:ActiveRecord) || !defined?(ActiveRecord::Base)

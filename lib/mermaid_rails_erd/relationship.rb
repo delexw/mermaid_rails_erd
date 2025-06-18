@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   class Relationship
     attr_reader :from_table, :to_table, :foreign_key, :relationship_type, :label, :fk_table, :fk_column, :pk_table, :pk_column, :is_polymorphic, :extra_label
 

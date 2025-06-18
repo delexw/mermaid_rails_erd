@@ -6,7 +6,7 @@ require_relative "relationship_builders/has_one_relationship_builder"
 require_relative "relationship_builders/habtm_relationship_builder"
 require_relative "model_data_collector"
 
-module RailsMermaidErd
+module MermaidRailsErd
   class RelationshipRegistry
     attr_reader :builders, :polymorphic_resolver, :model_data_collector
 

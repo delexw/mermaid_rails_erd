@@ -2,11 +2,12 @@
 
 require_relative "base_relationship_builder"
 
-module RailsMermaidErd
+module MermaidRailsErd
   module RelationshipBuilders
-    class HasManyRelationshipBuilder < BaseRelationshipBuilder
+    class HasOneRelationshipBuilder < BaseRelationshipBuilder
       def build(model, assoc)
         from_table = model.table_name
+        rel_type = symbol_mapper.map(assoc.macro)
         fk = safe_foreign_key(model, assoc)
 
         # Skip if we couldn't determine the foreign key
@@ -14,13 +15,15 @@ module RailsMermaidErd
 
         to_table_info = resolve_association_model(model, assoc)
 
+        # Skip if this is a duplicate one-to-one relationship
+        return [] if skip_duplicate_one_to_one?(model, assoc, to_table_info)
+
         if to_table_info
-          # FK is on target table for has_many
           [Relationship.new(
-            to_table_info[:table_name],
             from_table,
+            to_table_info[:table_name],
             fk,
-            "}o--||",
+            rel_type,
             nil, # Let the Relationship generate the label
             to_table_info[:table_name], # fk_table
             fk, # fk_column

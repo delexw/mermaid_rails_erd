@@ -3,7 +3,7 @@
 require_relative "base_relationship_builder"
 require_relative "../relationship"
 
-module RailsMermaidErd
+module MermaidRailsErd
   module RelationshipBuilders
     class HasAndBelongsToManyRelationshipBuilder < BaseRelationshipBuilder
       def initialize(symbol_mapper:, association_resolver:, printed_tables: Set.new, model_data_collector: nil)

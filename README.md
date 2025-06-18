@@ -1,7 +1,7 @@
-# Rails Mermaid ERD
+# Mermaid Rails ERD
 
-[![Gem Version](https://badge.fury.io/rb/rails_mermaid_erd.svg)](https://badge.fury.io/rb/rails_mermaid_erd)
-[![CI](https://github.com/delexw/rails_mermaid_erd/workflows/CI/badge.svg)](https://github.com/delexw/rails_mermaid_erd/actions)
+[![Gem Version](https://badge.fury.io/rb/mermaid_rails_erd.svg)](https://badge.fury.io/rb/mermaid_rails_erd)
+[![CI](https://github.com/delexw/mermaid_rails_erd/workflows/CI/badge.svg)](https://github.com/delexw/mermaid_rails_erd/actions)
 
 A Ruby gem that generates [Mermaid.js](https://mermaid.js.org/) Entity Relationship Diagrams (ERD) from ActiveRecord models in Rails applications.
 
@@ -18,7 +18,7 @@ A Ruby gem that generates [Mermaid.js](https://mermaid.js.org/) Entity Relations
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rails_mermaid_erd', group: :development
+gem 'mermaid_rails_erd', group: :development
 ```
 
 And then execute:
@@ -30,7 +30,7 @@ $ bundle install
 Or install it yourself as:
 
 ```bash
-$ gem install rails_mermaid_erd
+$ gem install mermaid_rails_erd
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ $ gem install rails_mermaid_erd
 The simplest way to generate your ERD is using the provided Rake task:
 
 ```bash
-$ bundle exec rails rails_mermaid_erd:generate
+$ bundle exec rails mermaid_rails_erd:generate
 ```
 
 This will:
@@ -57,7 +57,7 @@ You can access the collected model and relationship data directly without genera
 
 ```ruby
 # Get all collected data in a structured format
-data = RailsMermaidErd.build.parsed_data
+data = MermaidRailsErd.build.parsed_data
 
 # Access collected data
 models_data = data.models_data                           # Hash of models having table keyed by model name
@@ -179,7 +179,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/delexw/rails_mermaid_erd.
+Bug reports and pull requests are welcome on GitHub at https://github.com/delexw/mermaid_rails_erd.
 
 ## License
 

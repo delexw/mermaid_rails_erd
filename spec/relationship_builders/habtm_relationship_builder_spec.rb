@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::RelationshipBuilders::HasAndBelongsToManyRelationshipBuilder do
+RSpec.describe MermaidRailsErd::RelationshipBuilders::HasAndBelongsToManyRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
   let(:printed_tables) { Set.new }

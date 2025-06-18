@@ -2,7 +2,7 @@
 
 require_relative "base_relationship_builder"
 
-module RailsMermaidErd
+module MermaidRailsErd
   module RelationshipBuilders
     class BelongsToRelationshipBuilder < BaseRelationshipBuilder
       def build(model, assoc)

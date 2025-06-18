@@ -2,16 +2,16 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd do
+RSpec.describe MermaidRailsErd do
   it "has a version number" do
-    expect(RailsMermaidErd::VERSION).not_to be_nil
+    expect(MermaidRailsErd::VERSION).not_to be_nil
   end
 
   describe ".build" do
     it "creates a new generator and collects data" do
       # Mock the Generator
-      generator = instance_double(RailsMermaidErd::Generator)
-      allow(RailsMermaidErd::Generator).to receive(:new).and_return(generator)
+      generator = instance_double(MermaidRailsErd::Generator)
+      allow(MermaidRailsErd::Generator).to receive(:new).and_return(generator)
       allow(generator).to receive(:build).and_return(generator)
 
       expect(described_class.build).to eq(generator)
@@ -21,7 +21,7 @@ RSpec.describe RailsMermaidErd do
   describe ".generate" do
     it "uses build and emit to generate the diagram" do
       # Mock the Generator
-      generator = instance_double(RailsMermaidErd::Generator)
+      generator = instance_double(MermaidRailsErd::Generator)
       allow(described_class).to receive(:build).and_return(generator)
       allow(generator).to receive(:emit).with(output: $stdout)
 
@@ -33,7 +33,7 @@ RSpec.describe RailsMermaidErd do
 
     it "passes custom output to emit" do
       # Mock the Generator
-      generator = instance_double(RailsMermaidErd::Generator)
+      generator = instance_double(MermaidRailsErd::Generator)
       custom_output = StringIO.new
 
       allow(described_class).to receive(:build).and_return(generator)

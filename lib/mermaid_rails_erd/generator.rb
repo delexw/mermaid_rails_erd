@@ -11,7 +11,7 @@ require_relative "relationship_registry"
 require_relative "model_data_collector"
 require_relative "parsed_data"
 
-module RailsMermaidErd
+module MermaidRailsErd
   class Generator
     def initialize(output: nil)
       @output = output

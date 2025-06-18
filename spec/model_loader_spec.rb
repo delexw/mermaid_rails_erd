@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::ModelLoader do
+RSpec.describe MermaidRailsErd::ModelLoader do
   describe "#load" do
     let(:loader) { described_class.new }
 
@@ -69,7 +69,7 @@ RSpec.describe RailsMermaidErd::ModelLoader do
       end
 
       it "raises an error" do
-        expect { loader.load }.to raise_error(RailsMermaidErd::Error, /Rails is not loaded/)
+        expect { loader.load }.to raise_error(MermaidRailsErd::Error, /Rails is not loaded/)
       end
     end
   end

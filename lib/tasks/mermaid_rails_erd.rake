@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "rails_mermaid_erd"
+require "mermaid_rails_erd"
 
-namespace :rails_mermaid_erd do
+namespace :mermaid_rails_erd do
   desc "Generate Mermaid ERD diagram from ActiveRecord models"
   task generate: :environment do
     output_path = Rails.root.join("tmp", "#{ActiveRecord::Base.connection.current_database}.mmd")
@@ -19,7 +19,7 @@ namespace :rails_mermaid_erd do
     begin
       File.open(output_path, "w") do |file|
         puts "Generating Mermaid ERD diagram..."
-        RailsMermaidErd.generate(output: file)
+        MermaidRailsErd.generate(output: file)
       end
     rescue Errno::EACCES, IOError => e
       puts "Error: Could not write to #{output_path}: #{e.message}"

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   # Class to hold parsed ERD data with delegation to model_data_collector
   # Provides structured access to relationships, tables, and model data
   class ParsedData

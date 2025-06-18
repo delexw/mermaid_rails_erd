@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   class ModelLoader
     def load
-      raise RailsMermaidErd::Error, "Rails is not loaded" unless defined?(Rails)
+      raise MermaidRailsErd::Error, "Rails is not loaded" unless defined?(Rails)
 
       Rails.application.eager_load! unless Rails.configuration.cache_classes
       ActiveRecord::Base.descendants.reject(&:abstract_class?)

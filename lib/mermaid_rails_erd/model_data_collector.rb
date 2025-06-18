@@ -2,7 +2,7 @@
 
 require_relative "column_info"
 
-module RailsMermaidErd
+module MermaidRailsErd
   class ModelDataCollector
     attr_reader :models_data, :tables, :models_no_tables, :models, :invalid_associations, :polymorphic_associations, :regular_associations
 

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::Relationship do
+RSpec.describe MermaidRailsErd::Relationship do
   describe "#initialize" do
     it "sets attributes from parameters" do
       relationship = described_class.new(

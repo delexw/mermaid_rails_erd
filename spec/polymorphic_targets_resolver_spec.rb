@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::PolymorphicTargetsResolver do
+RSpec.describe MermaidRailsErd::PolymorphicTargetsResolver do
   let(:model_data_collector) { double("ModelDataCollector") }
   let(:resolver) { described_class.new(model_data_collector) }
 

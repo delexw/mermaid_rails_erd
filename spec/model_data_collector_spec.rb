@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::ModelDataCollector do
+RSpec.describe MermaidRailsErd::ModelDataCollector do
   let(:model_loader) { double("ModelLoader") }
   let(:collector) { described_class.new(model_loader) }
 

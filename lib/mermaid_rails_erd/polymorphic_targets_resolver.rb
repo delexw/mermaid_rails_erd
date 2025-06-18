@@ -2,7 +2,7 @@
 
 require_relative "relationship"
 
-module RailsMermaidErd
+module MermaidRailsErd
   class PolymorphicTargetsResolver
     attr_reader :model_data_collector
 

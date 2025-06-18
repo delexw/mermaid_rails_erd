@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   class RelationshipSymbolMapper
     def map(assoc_type)
       {

@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::RelationshipSymbolMapper do
+RSpec.describe MermaidRailsErd::RelationshipSymbolMapper do
   describe "#map" do
     let(:mapper) { described_class.new }
 

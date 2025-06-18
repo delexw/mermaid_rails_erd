@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::RelationshipBuilders::HasOneRelationshipBuilder do
+RSpec.describe MermaidRailsErd::RelationshipBuilders::HasOneRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
   let(:model_data_collector) { double("ModelDataCollector", register_invalid_association: nil) }

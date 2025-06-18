@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe RailsMermaidErd::AssociationResolver do
+RSpec.describe MermaidRailsErd::AssociationResolver do
   describe "#resolve" do
     let(:resolver) { described_class.new }
 

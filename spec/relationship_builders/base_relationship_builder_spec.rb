@@ -5,7 +5,7 @@ require "spec_helper"
 # Define a custom error class for testing
 class TestError < StandardError; end
 
-RSpec.describe RailsMermaidErd::RelationshipBuilders::BaseRelationshipBuilder do
+RSpec.describe MermaidRailsErd::RelationshipBuilders::BaseRelationshipBuilder do
   let(:symbol_mapper) { double("SymbolMapper") }
   let(:association_resolver) { double("AssociationResolver") }
   let(:model_data_collector) { double("ModelDataCollector") }

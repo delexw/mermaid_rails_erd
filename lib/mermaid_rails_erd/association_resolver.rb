@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module RailsMermaidErd
+module MermaidRailsErd
   class AssociationResolver
     def resolve(assoc)
       # Try direct table_name access if available
